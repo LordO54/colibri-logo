@@ -1,0 +1,12 @@
+# Entorno "vda" (D:\video_eval\.venv_vda): solo el notebook 05 (Video Depth Anything Small).
+# PROVISIONAL: se sustituye por `pip freeze` del .venv_vda de la laptop al validar el repo.
+# Además de esto hace falta el repositorio de Video Depth Anything en D:\video_eval\modelos\Video-Depth-Anything
+# (commit en instalar.md) con su requirements.txt, y el checkpoint video_depth_anything_vits.pth.
+torch
+opencv-python
+numpy
+pandas
+scipy
+matplotlib
+pyyaml
+ipykernel

@@ -1,0 +1,17 @@
+# Entorno "yolo" (D:\video_eval\.venv): datos, detector, tracking, 7 puntos y lectura de profundidad.
+# PROVISIONAL: se sustituye por `pip freeze` del .venv de la laptop (versiones exactas) al validar el repo.
+ultralytics>=8.4
+torch
+roboflow
+opencv-python
+numpy
+pandas
+scipy
+matplotlib
+plotly
+pyyaml
+pillow
+imagehash
+ipykernel
+nbstripout
+yt-dlp

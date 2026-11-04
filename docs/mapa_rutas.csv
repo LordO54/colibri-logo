@@ -1,0 +1,41 @@
+origen,destino,en_git,accion,nota
+C:\Users\ACER\Documents\logo\video-val\AdobeStock_*.mov,D:\video_eval\datos\fuentes\videos\{vv|train}\,no,mover,vv01 vv02 a vv\; AdobeStock_1600207728 a train\
+C:\Users\ACER\Documents\logo\video-val\Flying White-necked Jacobin*.mov,D:\video_eval\datos\fuentes\videos\vv\,no,mover,vv03
+C:\Users\ACER\Documents\logo\video-val\train_*.mp4,D:\video_eval\datos\fuentes\videos\train\,no,mover,
+C:\Users\ACER\Documents\logo\video-val\test_*.mp4,D:\video_eval\datos\fuentes\videos\test\,no,mover,
+D:\video_eval\colibri_work\data\roboflow_raw\*,D:\video_eval\datos\roboflow\raw\,no,mover,ds1 y ds2 descargados
+D:\video_eval\colibri_work\data\final*,D:\video_eval\datos\roboflow\,no,mover,final y final_ds2 (las rutas de train_ft.txt viejo dejan de valer; el notebook 01 las regenera)
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26n_ds2_ds1\best.pt,D:\video_eval\modelos\yolo26n_ds2_ds1\best.pt,no,copiar,detector anterior (D-05)
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26n_ft_v2\{best.pt;args.yaml;results.csv},colibri-logo\modelos\yolo26n_ft_v2\,si,copiar,detector vigente (D-08)
+C:\Users\ACER\Documents\logo\video-val\eval_frames\{videos.csv;manifest_frames.csv;prueba_etiquetas_corregidas.zip;LEEME.md;linea_base_coco_bird.csv},colibri-logo\datos_derivados\vv\,si,copiar,prueba vv (S1-S2)
+D:\video_eval\reentreno\{manifest_reentrenamiento.csv;seleccion_vv.csv},colibri-logo\datos_derivados\humming\,si,copiar,selección de frames S4
+C:\Users\ACER\Documents\logo\video-val\reentreno\resumen.txt,colibri-logo\datos_derivados\humming\resumen_seleccion.txt,si,copiar,parámetros de la selección
+D:\video_eval\reentreno\v2\split_manifest.csv,colibri-logo\datos_derivados\humming\split_manifest_v1.csv,si,copiar,GT v1
+D:\video_eval\reentreno\v2\humming\{train;valid;test}\labels\*.txt,colibri-logo\datos_derivados\humming\etiquetas_v1\{split}\,si,copiar,solo etiquetas: las imágenes no se publican
+D:\video_eval\reentreno\v2\rf_humming\test\labels\vv*.txt,colibri-logo\datos_derivados\humming\roboflow_v1_vv\,si,copiar,GT de vv para la rejilla de unión (load_gt de union.py)
+D:\video_eval\reentreno\v2\eval_gt2\split_manifest.csv,colibri-logo\datos_derivados\humming\split_manifest_v2.csv,si,copiar,GT v2
+D:\video_eval\reentreno\v2\eval_gt2\humming\{train;valid;test}\labels\*.txt,colibri-logo\datos_derivados\humming\etiquetas_v2\{split}\,si,copiar,
+D:\video_eval\reentreno\v2\eval_gt2\cambios_v1_v2.csv,colibri-logo\datos_derivados\humming\,si,copiar,verificar nombre (comparar_gt.py)
+D:\video_eval\reentreno\v2\tracking\*\*__detallada.{csv;meta.json},colibri-logo\datos_derivados\tracks\{config}\,si,copiar,5 configuraciones x 4 test_ (S5)
+D:\video_eval\reentreno\v2\union\tracks\*__detallada.{csv;meta.json},colibri-logo\datos_derivados\tracks\b_nuevo_bt_combo\,si,copiar,vv y train_ de la rejilla
+D:\video_eval\reentreno\v2\tracking\{metricas_tracking_test.csv;eleccion.json;tracks_cortos.csv;resumen_trayectorias.csv},colibri-logo\resultados\S5_tracking_union_test\gt1\,si,copiar,
+D:\video_eval\reentreno\v2\eval_gt2\tracking\{metricas_tracking_test.csv;eleccion.json},colibri-logo\resultados\S5_tracking_union_test\gt2\,si,copiar,
+D:\video_eval\reentreno\v2\union\{union_rejilla.csv;union_rejilla_por_video.csv;union_test.csv;eleccion_union.json;union_ajuste_valid.csv},colibri-logo\resultados\S5_tracking_union_test\,si,copiar,
+D:\video_eval\reentreno\v2\eval_gt2\union\{union_test_gt1_gt2.csv;puentes_gt2.csv},colibri-logo\resultados\S5_tracking_union_test\,si,copiar,
+D:\video_eval\reentreno\v2\eval_gt2\union\prudente\trayectoria_*.{csv;png},colibri-logo\resultados\S5_tracking_union_test\trayectorias_prudente\,si,copiar,entrada de 04 y 06 (D-10)
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26n_ft_v2\comparacion.csv,colibri-logo\resultados\S4_reentreno_v2\,si,copiar,gate GT v1
+D:\video_eval\reentreno\v2\eval_gt2\deteccion_gt2.csv,colibri-logo\resultados\S4_reentreno_v2\,si,copiar,gate GT v2
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26s_v2\veredicto.json,colibri-logo\resultados\S6_spike_yolo26s\yolo26s_v2\,si,copiar,
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26s_ft_v2\veredicto.json,colibri-logo\resultados\S6_spike_yolo26s\yolo26s_ft_v2\,si,copiar,
+C:\Users\ACER\Documents\logo\video-val\resultados\trayectorias_7pts\*.{csv;png;jpg},colibri-logo\resultados\S7_trayectorias_2d\,si,copiar,
+D:\video_eval\reentreno\v2\profundidad\siete_puntos\salidas\*\{control_ruido.csv;filtro.csv;puntos_*.csv;serie_*.csv;*.jpg;*.html},colibri-logo\resultados\S8_exploracion_3d\salidas\{tag}\,si,copiar,html de plotly solo si < 5 MB
+D:\video_eval\reentreno\v2\profundidad\siete_puntos\salidas\puntos_i5bE_salientes_delante.csv,colibri-logo\datos_derivados\profundidad\,si,copiar,D-15 (congelado)
+D:\video_eval\reentreno\v2\profundidad\siete_puntos\i5bE_punto2\{seleccion_delante.json;verificacion_delante.jpg},colibri-logo\datos_derivados\profundidad\,si,copiar,
+D:\video_eval\reentreno\v2\profundidad\adobe\revision_ciega\{plantilla_revision_ciega.csv;clave_revision_ciega.csv},colibri-logo\datos_derivados\profundidad\revision_ciega\,si,copiar,juicio humano de Yilber (congelado)
+D:\video_eval\reentreno\v2\profundidad\siete_puntos\salidas\comparacion_backends\ciega\*.{csv;jpg},colibri-logo\resultados\S8_exploracion_3d\ciega\,si,copiar,D-18
+D:\video_eval\reentreno\v2\profundidad\adobe\{trayectorias;puntos7}\*.csv,colibri-logo\resultados\S8_exploracion_3d\adobe\,si,copiar,
+C:\Users\ACER\Documents\logo\video-val\resultados\profundidad\**\*.md,colibri-logo\resultados\S8_exploracion_3d\,si,copiar,decision_sp027 lectura informe
+D:\video_eval\reentreno\v2\profundidad\siete_puntos\cache_vda\*,D:\video_eval\runs\profundidad\cache_vda\,no,mover,mapas de VDA (cientos de MB)
+D:\video_eval\reentreno\v2\profundidad\siete_puntos\*-depth.pt,D:\video_eval\modelos\depth\,no,mover,
+D:\video_eval\colibri_work\reports\run_record.json,colibri-logo\resultados\S1_datos\,si,copiar,SHA1 de las particiones de S1
+D:\video_eval\colibri_work\reports\*,colibri-logo\resultados\{S2_detector_v1;S3_tracking_piloto}\,si,copiar,línea base, comparación S2 y barrido_trackers.csv de S3 (verificar nombres)
