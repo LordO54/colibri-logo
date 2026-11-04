@@ -1,0 +1,32 @@
+# Secretos
+.env
+*.env
+!.env.example
+
+# Entornos y cachés
+.venv*/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Datos pesados: viven en la zona de trabajo (config.yaml), nunca en el repo
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.npz
+*.npy
+*.zip
+!datos_derivados/vv/prueba_etiquetas_corregidas.zip
+*.cache
+runs/
+datos/
+
+# Pesos: solo el vigente va en git
+*.pt
+*.pth
+!modelos/yolo26n_ft_v2/best.pt
+
+# Imágenes de datasets (las figuras de resultados sí se versionan)
+datos_derivados/**/*.jpg
+datos_derivados/**/*.png
