@@ -4,6 +4,24 @@ Trayectorias de colibríes en video para diseñar un logo. Un detector YOLO26 en
 las visitas a la flor se convierten en trayectorias y cada trayectoria se reduce a **7 puntos** que sirven de geometría
 base. Ahora se explora si la profundidad monocular aporta una tercera dimensión creíble.
 
+## Dos usos
+
+| Quiero... | Usa | Necesitas |
+|---|---|---|
+| **Sacar trayectorias de mis videos** con el mejor detector publicado, hasta la 3D | [`notebooks/herramienta_trayectorias.ipynb`](notebooks/herramienta_trayectorias.ipynb) | 1 entorno, tus videos, GPU para la 3D |
+| **Entrenar con mi dataset** | notebooks `01` (sección 2) y `02` (sección 6), con `config.yaml` → `datasets` | Lo anterior, y una carpeta YOLO o un proyecto de Roboflow |
+| **Seguir o comprobar la investigación** | notebooks `01` a `06` y [`docs/guia_replicacion.md`](docs/guia_replicacion.md) | Según el recorrido |
+
+### Usar la herramienta
+
+1. Clona el repo dentro de una carpeta de trabajo e instala el entorno: [`entornos/instalar.md`](entornos/instalar.md), secciones 1 a 3.
+2. Pon tus videos en `datos/mis_videos/`, dentro de esa carpeta de trabajo, o indica otra carpeta o unas URL en el notebook.
+3. Ejecuta el notebook. Los resultados quedan en `runs/herramienta/<video>/`: trayectoria, 7 puntos y, si marcas la flor y el
+   fondo de ese video, la trayectoria 3D en HTML. Todo queda fuera de git.
+
+Funciona mejor con cámara fija y un ave a la vez. No hay verdad de terreno para tus videos, y la 3D es exploratoria. El
+detector se actualiza con `git pull` cuando publicamos uno mejor ([`modelos/README.md`](modelos/README.md)).
+
 **Estado (S9, 2026-11-04):** pipeline 2D cerrado y vigente; 3D en exploración (SP-02.9 pendiente); el diseño del logo
 (E-03 a E-05) todavía no ha empezado. Qué usar hoy: [`resultados/VIGENTE.md`](resultados/VIGENTE.md).
 
@@ -40,8 +58,9 @@ Lo pesado no está en git: vive en la **zona de trabajo** (`D:\video_eval` en la
 
 | Notebook | Sprint | Kernel | Qué hace | Decisiones |
 |---|---|---|---|---|
+| `herramienta_trayectorias` | — | yolo | **tus videos** → trayectoria → 7 puntos → 3D, sin verdad de terreno | D-21 |
 | `00_comun` | — | ambos | config, rutas y funciones compartidas | — |
-| `01_fuentes_y_datasets` | S1, S4 | yolo | verifica los videos, descarga ds1/ds2, auditoría, re-partición, regenera los frames de humming | D-01..D-03, D-07, D-20 |
+| `01_fuentes_y_datasets` | S1, S4 | yolo | verifica los videos, carga los datasets de `config.yaml`, auditoría, re-partición, regenera los frames de humming | D-01..D-03, D-07, D-20 |
 | `02_detector` | S2, S4, S6 | yolo | evaluador, línea base, entrenamiento (`ENTRENAR`), gate viejo/nuevo, spike `s` | D-05, D-08, D-11 |
 | `03_tracking_y_union` | S3, S5 | yolo | 5 trackers en `test_`, rejilla de unión, unión prudente con GT v1/v2 | D-09, D-10 |
 | `04_trayectorias_7_puntos` | S7 | yolo | 7 puntos (uniforme y salientes), curvas y láminas | D-12 |

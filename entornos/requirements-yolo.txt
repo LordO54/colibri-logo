@@ -1,4 +1,4 @@
-# Entorno "yolo" (D:\video_eval\.venv): datos, detector, tracking, 7 puntos y lectura de profundidad.
+# Entorno "yolo" (D:\video_eval\.venv): herramienta completa, datos, detector, tracking, 7 puntos y profundidad.
 # `pip freeze` del .venv de la laptop (versiones exactas). torch +cu124 sale del índice de PyTorch:
 --extra-index-url https://download.pytorch.org/whl/cu124
 annotated-doc==0.0.5
@@ -102,5 +102,8 @@ urllib3==2.8.0
 wcwidth==0.9.4
 webencodings==0.6.1
 nbstripout==0.9.1
-# Descarga de los videos de YouTube (notebook 01, sección 1); no estaba en el freeze
+# Descarga de videos por URL (herramienta y notebook 01, sección 1)
 yt-dlp
+# Video Depth Anything en este mismo entorno (herramienta, D-21)
+easydict==1.13
+einops==0.8.2

@@ -7796,7 +7796,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=296e4c53">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7805,19 +7805,19 @@ a.anchor-link {
 <h1 id="05-%C2%B7-Mapas-de-profundidad-con-Video-Depth-Anything-Small-(S8)">05 · Mapas de profundidad con Video Depth Anything Small (S8)<a class="anchor-link" href="#05-%C2%B7-Mapas-de-profundidad-con-Video-Depth-Anything-Small-(S8)">¶</a></h1><p><strong>Historia:</strong> SP-02.7 (spike de profundidad monocular). <strong>Kernel:</strong> <code>colibri-vda</code> (otro torch y el repo de VDA; ver
 <code>entornos/instalar.md</code>). Es el único notebook que usa ese entorno.</p>
 <p>Procesa el video completo dos veces (original y volteado horizontalmente) y guarda los mapas en float16 en
-<code>runs/profundidad/cache_vda/&lt;corto&gt;_{orig,flip}.npz</code>, ya alineados con el frame original. El notebook 06 los lee con
+<code>runs/profundidad/cache_vda/&lt;corto&gt;_{orig,flip}.npz</code> (función <code>mapas_vda</code> de <code>00_comun</code>, que también usa la herramienta), ya alineados con el frame original. El notebook 06 los lee con
 el backend <code>vda</code> de <code>00_comun</code>.</p>
 <ul>
 <li><strong>Licencia (D-17):</strong> solo el modelo Small (Apache-2.0). Base y Large son CC-BY-NC y no se usan.</li>
 <li><strong>Salida:</strong> disparidad relativa, mayor = más cerca (al revés que YOLO26-Depth).</li>
-<li><strong>Memoria:</strong> prueba resoluciones de entrada de mayor a menor (448, 392, 336, 280) hasta que cabe en la GPU
-(6 GB en la laptop, sin xFormers). La usada queda en <code>info.json</code>.</li>
+<li><strong>Resolución:</strong> la de <code>config.yaml</code> → <code>vda.sizes</code>, de mayor a menor hasta que cabe en la GPU; la usada queda en <code>info.json</code>.
+S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_norm</code>:</strong> en i5bE, hasta 0,46 entre 448 y 392.</li>
 </ul>
 <p>En modo <code>artefactos</code> no recalcula los mapas que ya existan: los <code>.npz</code> pesan cientos de MB y no van en git.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6dbb1ede">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7827,10 +7827,9 @@ el backend <code>vda</code> de <code>00_comun</code>.</p>
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">run</span> 00_comun.ipynb
 <span class="n">VIDEO_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i5bE"</span><span class="p">]</span>          <span class="c1"># cortos de datos_derivados/fuentes.csv; SP-02.9 añadirá otro video de cámara fija</span>
-<span class="n">VDA_REPO</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"modelos"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"Video-Depth-Anything"</span>
 <span class="n">CACHE</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"profundidad"</span> <span class="o">/</span> <span class="s2">"cache_vda"</span><span class="p">;</span> <span class="n">CACHE</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">VIDEOS</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">video_path</span><span class="p">(</span><span class="n">FUENTES</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"corto"</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">video_id</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">}</span>
-<span class="n">SIZES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VDA_SIZES"</span><span class="p">,</span> <span class="s2">"448,392,336,280"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">))</span>
+<span class="n">SIZES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VDA_SIZES"</span><span class="p">,</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">CFG</span><span class="p">[</span><span class="s2">"vda"</span><span class="p">][</span><span class="s2">"sizes"</span><span class="p">])))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">VIDEOS</span><span class="p">,</span> <span class="s2">"| sizes"</span><span class="p">,</span> <span class="n">SIZES</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -7844,15 +7843,21 @@ el backend <code>vda</code> de <code>00_comun</code>.</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY
-00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
-{'i5bE': 'D:\\video_eval\\datos\\fuentes\\videos\\test\\test_YTDown.com_YouTube_Media_i5bEfvb5mxg_Ruby-Throated-Hummingbird-At-A-Flower-Part-2_001_1080p.mp4'} | sizes (448, 392, 336, 280)
+<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
+{'i5bE': 'D:\\video_eval\\datos\\fuentes\\videos\\test\\test_YTDown.com_YouTube_Media_i5bEfvb5mxg_Ruby-Throated-Hummingbird-At-A-Flower-Part-2_001_1080p.mp4'} | sizes (392, 336, 280)
 </pre>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c75df00f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7860,123 +7865,11 @@ el backend <code>vda</code> de <code>00_comun</code>.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">VDA_REPO</span><span class="p">));</span> <span class="n">_cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">();</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">VDA_REPO</span><span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">video_depth_anything.video_depth</span><span class="w"> </span><span class="kn">import</span> <span class="n">VideoDepthAnything</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">_cwd</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"torch"</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span> <span class="s2">"| cuda"</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>xFormers not available
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>xFormers not available
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>xFormers not available
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>xFormers not available
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>torch 2.6.0+cu124 | cuda True
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a5caf556">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Portado de video-val/resultados/profundidad/siete_puntos/vda_inferir.py</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_all</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">short</span><span class="p">):</span>
-    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">path</span><span class="p">);</span> <span class="n">fps</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">);</span> <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">ok</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span> <span class="k">break</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">short</span> <span class="o">/</span> <span class="nb">min</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fx</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">fy</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_AREA</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
-    <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="n">fps</span>
-
-<span class="c1"># Portado de video-val/resultados/profundidad/siete_puntos/vda_inferir.py</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">VideoDepthAnything</span><span class="p">(</span><span class="n">encoder</span><span class="o">=</span><span class="s2">"vits"</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="p">[</span><span class="mi">48</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">])</span>
-    <span class="n">m</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">VDA_REPO</span> <span class="o">/</span> <span class="s2">"checkpoints"</span> <span class="o">/</span> <span class="s2">"video_depth_anything_vits.pth"</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span> <span class="n">weights_only</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">"cuda"</span><span class="p">)</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-    <span class="n">used</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">VIDEOS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"orig"</span><span class="p">,</span> <span class="s2">"flip"</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">CACHE</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">.npz"</span>
-            <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span> <span class="k">continue</span>
-            <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">SIZES</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">();</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">();</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">reset_peak_memory_stats</span><span class="p">()</span>
-                    <span class="n">frames</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="n">read_all</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">"flip"</span><span class="p">:</span> <span class="n">frames</span> <span class="o">=</span> <span class="n">frames</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                    <span class="n">d</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">infer_video_depth</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span><span class="p">,</span> <span class="n">fp32</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                    <span class="k">break</span>
-                <span class="k">except</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">OutOfMemoryError</span><span class="p">,</span> <span class="ne">MemoryError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="s2">"sin memoria a"</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span> <span class="n">frames</span> <span class="o">=</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">();</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"no cabe a ninguna resolución"</span><span class="p">)</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">"flip"</span><span class="p">:</span> <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">maps</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">))</span>
-            <span class="n">used</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">size</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"input </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> fps"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"pico GPU </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">max_memory_allocated</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB"</span><span class="p">,</span> <span class="s2">"rango"</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">frames</span> <span class="o">=</span> <span class="n">d</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">();</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
-    <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">modelo</span><span class="o">=</span><span class="s2">"vda-small"</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="n">used</span><span class="p">,</span> <span class="n">salida</span><span class="o">=</span><span class="s2">"disparidad relativa, mayor = más cerca"</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f1032e12">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">pendientes</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">VIDEOS</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"orig"</span><span class="p">,</span> <span class="s2">"flip"</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">.npz"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
 <span class="k">if</span> <span class="n">pendientes</span> <span class="ow">or</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"recalcular"</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"recalcular"</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"modo recalcular: borra a mano los .npz que quieras rehacer; los existentes no se sobrescriben"</span><span class="p">)</span>
-    <span class="n">main</span><span class="p">()</span>
+    <span class="n">mapas_vda</span><span class="p">(</span><span class="n">VIDEOS</span><span class="p">,</span> <span class="n">CACHE</span><span class="p">,</span> <span class="n">SIZES</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"mapas ya calculados:"</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">CACHE</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.npz"</span><span class="p">)))</span>
 </pre></div>
@@ -7997,12 +7890,12 @@ el backend <code>vda</code> de <code>00_comun</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9977b1ca">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">{}</span>
@@ -8037,7 +7930,7 @@ el backend <code>vda</code> de <code>00_comun</code>.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5de5a421">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

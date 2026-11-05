@@ -7796,7 +7796,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6d38410b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7852,7 +7852,7 @@ recalcula todas las métricas y las compara. Tarda unos minutos (solo lee videos
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3abdd3f0">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7875,15 +7875,21 @@ recalcula todas las métricas y las compara. Tarda unos minutos (solo lee videos
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY
-00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
+<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dcc494f0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7895,7 +7901,7 @@ Un frame con 2+ cajas no forma ni separa visitas.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=db6c7286">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8006,7 +8012,7 @@ GT v2: 216 frames | 177 cajas | máx. aves por frame 1
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7c1ea297">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8018,7 +8024,7 @@ La configuración <code>e_viejo_oc_combo</code> (modelo anterior) solo es refere
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4e84f62a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8385,7 +8391,7 @@ La configuración <code>e_viejo_oc_combo</code> (modelo anterior) solo es refere
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0aed2f3a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8399,7 +8405,7 @@ puentes falsos, luego mayor IDF1 de visita, luego menos segmentos por visita.</p
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a2857f7b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8429,21 +8435,24 @@ puentes falsos, luego mayor IDF1 de visita, luego menos segmentos por visita.</p
                 <span class="n">extra</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
-<span class="n">VIDS_AJUSTE</span> <span class="o">=</span> <span class="n">videos</span><span class="p">((</span><span class="s2">"vv"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">),</span> <span class="n">solo_ajuste_union</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">GT_U</span> <span class="o">=</span> <span class="n">cargar_gt_union</span><span class="p">({</span><span class="o">**</span><span class="n">VIDS_AJUSTE</span><span class="p">,</span> <span class="o">**</span><span class="n">VIDS_TEST</span><span class="p">})</span>
-<span class="n">UCONF</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"actual_30f_1.5"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_reference</span><span class="p">(</span><span class="n">tr</span><span class="p">)}</span>
-<span class="k">for</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">GRID</span><span class="p">:</span>
-    <span class="n">UCONF</span><span class="p">[</span><span class="sa">f</span><span class="s2">"g</span><span class="si">{</span><span class="n">gs</span><span class="si">}</span><span class="s2">s_d</span><span class="si">{</span><span class="n">dm</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_tuned</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">cuts</span><span class="p">))(</span><span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">)</span>
+<span class="n">VIDS_AJUSTE</span> <span class="o">=</span> <span class="n">videos</span><span class="p">((</span><span class="s2">"vv"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">),</span> <span class="n">solo_ajuste_union</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">omitir_faltantes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">FALTAN</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se omite la rejilla: faltan los videos"</span><span class="p">,</span> <span class="n">FALTAN</span><span class="p">,</span> <span class="s2">"(los vv son de Adobe Stock; ver docs/guia_replicacion.md)"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">GT_U</span> <span class="o">=</span> <span class="n">cargar_gt_union</span><span class="p">({</span><span class="o">**</span><span class="n">VIDS_AJUSTE</span><span class="p">,</span> <span class="o">**</span><span class="n">VIDS_TEST</span><span class="p">})</span>
+    <span class="n">UCONF</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"actual_30f_1.5"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_reference</span><span class="p">(</span><span class="n">tr</span><span class="p">)}</span>
+    <span class="k">for</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">GRID</span><span class="p">:</span>
+        <span class="n">UCONF</span><span class="p">[</span><span class="sa">f</span><span class="s2">"g</span><span class="si">{</span><span class="n">gs</span><span class="si">}</span><span class="s2">s_d</span><span class="si">{</span><span class="n">dm</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_tuned</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">cuts</span><span class="p">))(</span><span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">)</span>
 
-<span class="n">R</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">VIDS_AJUSTE</span><span class="p">,</span> <span class="n">GT_U</span><span class="p">,</span> <span class="n">UCONF</span><span class="p">,</span> <span class="p">{</span><span class="s2">"vv"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">},</span> <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
-<span class="n">R</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_rejilla_por_video.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="n">aggregate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">"records"</span><span class="p">)))</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">R</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)])</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">A</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_rejilla.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"ELEGIDA por la rejilla:"</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">config</span> <span class="o">!=</span> <span class="s2">"actual_30f_1.5"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
-<span class="n">display</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-<span class="n">comparar</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">REF</span> <span class="o">/</span> <span class="s2">"union_rejilla.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"config"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">,</span> <span class="s2">"cobertura"</span><span class="p">],</span>
-         <span class="n">nombre</span><span class="o">=</span><span class="s2">"rejilla de unión frente a S5"</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">VIDS_AJUSTE</span><span class="p">,</span> <span class="n">GT_U</span><span class="p">,</span> <span class="n">UCONF</span><span class="p">,</span> <span class="p">{</span><span class="s2">"vv"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">},</span> <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">R</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_rejilla_por_video.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="n">aggregate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">"records"</span><span class="p">)))</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">R</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)])</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_rejilla.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ELEGIDA por la rejilla:"</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">config</span> <span class="o">!=</span> <span class="s2">"actual_30f_1.5"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">comparar</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">REF</span> <span class="o">/</span> <span class="s2">"union_rejilla.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"config"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">,</span> <span class="s2">"cobertura"</span><span class="p">],</span>
+             <span class="n">nombre</span><span class="o">=</span><span class="s2">"rejilla de unión frente a S5"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8628,16 +8637,10 @@ puentes falsos, luego mayor IDF1 de visita, luego menos segmentos por visita.</p
 </pre>
 </div>
 </div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>True</pre>
 </div>
 </div>
 </div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=36f69979">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8648,7 +8651,7 @@ luego menos puentes largos.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1f64c47b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8835,7 +8838,7 @@ luego menos puentes largos.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d1dac67">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8847,7 +8850,7 @@ leen 04 y 06 en modo <code>artefactos</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=54b93039">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8906,7 +8909,7 @@ leen 04 y 06 en modo <code>artefactos</code>.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f8d6c41">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

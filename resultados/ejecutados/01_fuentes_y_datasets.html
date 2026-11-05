@@ -7796,7 +7796,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9dabb8f3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7804,7 +7804,9 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="01-%C2%B7-Fuentes-y-datasets-(S1,-S4)">01 · Fuentes y datasets (S1, S4)<a class="anchor-link" href="#01-%C2%B7-Fuentes-y-datasets-(S1,-S4)">¶</a></h1><p><strong>Historias:</strong> US-01.1 (fuentes y licencias), US-01.4 (auditoría), US-01.5 (particiones), US-01.6 (prueba virgen).
 <strong>Kernel:</strong> <code>colibri-yolo</code>.</p>
-<p>Este notebook deja la zona de trabajo (<code>D:\video_eval\datos</code>) lista para todos los demás, <strong>partiendo solo del repo</strong>:</p>
+<p>Este notebook deja la zona de trabajo (<code>D:\video_eval\datos</code>) lista para entrenar y evaluar, <strong>partiendo solo del repo</strong>.
+Lee los datasets de <code>config.yaml</code> → <code>datasets</code>, así que puedes usar <strong>los tuyos</strong> (sección 2).
+Para trayectorias con tus videos no hace falta: usa <code>herramienta_trayectorias</code>.</p>
 <table>
 <thead>
 <tr>
@@ -7860,7 +7862,7 @@ Los frames se decodifican <strong>en orden</strong> (<code>grab</code> secuencia
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7666717d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7883,14 +7885,20 @@ Los frames se decodifican <strong>en orden</strong> (<code>grab</code> secuencia
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
-00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d3512653">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7909,7 +7917,7 @@ cuadros. Si <code>frames</code> no coincide, las etiquetas de ese video <strong>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=58ebc253">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8166,19 +8174,72 @@ cuadros. Si <code>frames</code> no coincide, las etiquetas de ese video <strong>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0eb5748">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2.-Descarga-de-ds1-y-ds2-(US-01.4,-CA-01.4.1)">2. Descarga de ds1 y ds2 (US-01.4, CA-01.4.1)<a class="anchor-link" href="#2.-Descarga-de-ds1-y-ds2-(US-01.4,-CA-01.4.1)">¶</a></h2><p>Necesita <code>ROBOFLOW_API_KEY</code> en <code>.env</code> (copia <code>.env.example</code>). Cada persona usa su propia clave; los dos datasets son
-públicos. Desde aquí, las secciones 2 a 4 son las del notebook original de S1 (<code>historico/colibri_yolo26_tracking.ipynb</code>),
-con las rutas de <code>config.yaml</code>.</p>
+<h2 id="2.-Datasets-(US-01.4,-CA-01.4.1)">2. Datasets (US-01.4, CA-01.4.1)<a class="anchor-link" href="#2.-Datasets-(US-01.4,-CA-01.4.1)">¶</a></h2><p>Los datasets se configuran en <code>config.yaml</code> → <code>datasets</code>. Cada entrada es un proyecto de Roboflow o una carpeta local:</p>
+<div class="highlight"><pre><span></span><span class="nt">datasets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mis_fotos</span><span class="p">:</span><span class="w">                          </span><span class="c1"># carpeta local en formato YOLO: no se descarga nada</span>
+<span class="w">    </span><span class="nt">carpeta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">D:/datos/mis_fotos</span><span class="w">       </span><span class="c1"># con data.yaml y train/, valid/ y, si tienes, test/ (images/ y labels/)</span>
+<span class="w">    </span><span class="nt">stretched</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">                  </span><span class="c1"># true si se exportó estirado a 640x640 desde 16:9: se devuelve a 640x360</span>
+<span class="w">    </span><span class="nt">frames_video</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">               </span><span class="c1"># true si son frames de video: se re-parten por bloques temporales (sección 4)</span>
+<span class="w">    </span><span class="nt">licencia</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mía</span><span class="w">                     </span><span class="c1"># gate CA-01.4.2: toda fuente necesita su licencia registrada</span>
+<span class="w">  </span><span class="nt">mi_roboflow</span><span class="p">:</span><span class="w">                        </span><span class="c1"># o proyecto de Roboflow, con tu clave en .env</span>
+<span class="w">    </span><span class="nt">workspace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mi-ws</span>
+<span class="w">    </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mi-proyecto</span>
+<span class="w">    </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="nt">stretched</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">frames_video</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">licencia</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CC BY 4.0</span>
+<span class="nt">regenerar_humming</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">              </span><span class="c1"># sin los videos del proyecto: omite las secciones 5 y 6</span>
+</pre></div>
+<p>Cada dataset debe tener <strong>una sola clase</strong>; se unifica como <code>hummingbird</code>. Después, entrena con la sección 6 del notebook 02.</p>
+<h3 id="Los-datasets-del-proyecto">Los datasets del proyecto<a class="anchor-link" href="#Los-datasets-del-proyecto">¶</a></h3><p>Son los que trae <code>config.yaml</code>. Para volver a ellos después de cambiar la configuración, copia esto:</p>
+<div class="highlight"><pre><span></span><span class="nt">datasets</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ds1</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">workspace</span><span class="p">:</span><span class="w"> </span><span class="nv">magic-workspace</span><span class="p p-Indicator">,</span><span class="nt"> project</span><span class="p">:</span><span class="w"> </span><span class="nv">hummingbird-dataset-0zvvn</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> stretched</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> frames_video</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">ds2</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">workspace</span><span class="p">:</span><span class="w"> </span><span class="nv">modelodevisinartificialcolibres</span><span class="p p-Indicator">,</span><span class="nt"> project</span><span class="p">:</span><span class="w"> </span><span class="nv">hummingbirds-detect-classify-gcm5s</span><span class="p p-Indicator">,</span><span class="nt"> version</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> stretched</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> frames_video</span><span class="p">:</span><span class="w"> </span><span class="nv">false</span><span class="p p-Indicator">}</span>
+<span class="nt">regenerar_humming</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Qué es</th>
+<th>Licencia</th>
+<th>A tener en cuenta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ds1</strong></td>
+<td>Frames de 2 videos de cámara fija</td>
+<td>MIT declarada en Roboflow; procedencia de los videos sin verificar</td>
+<td>Estirado a 640×640 desde 16:9. Fuga casi total en su reparto: por eso <code>frames_video: true</code> (D-02)</td>
+</tr>
+<tr>
+<td><strong>ds2</strong></td>
+<td>Fotos variadas</td>
+<td>CC BY 4.0, exige atribución</td>
+<td>Conserva su reparto de Roboflow</td>
+</tr>
+<tr>
+<td><strong>humming</strong></td>
+<td>Frames de nuestros 12 videos, con cajas corregidas a mano</td>
+<td>Etiquetas en el repo; los videos no se redistribuyen</td>
+<td>No se descarga: las secciones 5 y 6 regeneran las imágenes desde los videos (<code>regenerar_humming: true</code>, D-07, D-20)</td>
+</tr>
+</tbody>
+</table>
+<p>ds1 y ds2 son públicos, pero cada persona usa su propia clave de Roboflow en <code>.env</code> (copia <code>.env.example</code>). Sus licencias
+están en <code>.env.example</code>. Desde aquí, las secciones 2 a 4 son las del notebook original de S1
+(<code>historico/colibri_yolo26_tracking.ipynb</code>), con las rutas y los datasets de <code>config.yaml</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eac4307c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8201,13 +8262,11 @@ con las rutas de <code>config.yaml</code>.</p>
     <span class="n">p</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Decisión 2026-11-01: entrenar con dataset 2 (fotos variadas) + dataset 1 (frames de video en vuelo).</span>
-<span class="c1"># Si haces fork a tu workspace con una versión sin "Stretch", cambia workspace/project/version aquí.</span>
-<span class="n">DATASETS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"ds1"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">workspace</span><span class="o">=</span><span class="s2">"magic-workspace"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">"hummingbird-dataset-0zvvn"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"yolo26"</span><span class="p">,</span>
-                <span class="n">tipo</span><span class="o">=</span><span class="s2">"frames de 2 videos"</span><span class="p">,</span> <span class="n">stretched_from_16_9</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-    <span class="s2">"ds2"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">workspace</span><span class="o">=</span><span class="s2">"modelodevisinartificialcolibres"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">"hummingbirds-detect-classify-gcm5s"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s2">"yolo26"</span><span class="p">,</span> <span class="n">tipo</span><span class="o">=</span><span class="s2">"fotos variadas"</span><span class="p">,</span> <span class="n">stretched_from_16_9</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<span class="p">}</span>
+<span class="c1"># Ahora vienen de config.yaml: ver la sección 2 para usar los tuyos.</span>
+<span class="n">DATASETS</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="s2">"format"</span><span class="p">:</span> <span class="s2">"yolo26"</span><span class="p">,</span> <span class="s2">"stretched"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"frames_video"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">v</span><span class="p">}</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">CFG</span><span class="p">[</span><span class="s2">"datasets"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">VIDEO_DS</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DATASETS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">"frames_video"</span><span class="p">]]</span>   <span class="c1"># se re-parten por bloques temporales</span>
+<span class="n">FOTO_DS</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">DATASETS</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">VIDEO_DS</span><span class="p">]</span>
+<span class="n">REGENERAR</span> <span class="o">=</span> <span class="n">CFG</span><span class="p">[</span><span class="s2">"regenerar_humming"</span><span class="p">]</span>
 <span class="n">CLASS_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">"hummingbird"</span><span class="p">}</span>      <span class="c1"># ds1 'hummingbird' y ds2 'colibri' se unifican en la clase 0</span>
 <span class="n">COCO_BIRD_ID</span> <span class="o">=</span> <span class="mi">14</span>                     <span class="c1"># clase 'bird' en COCO</span>
 <span class="n">IMG_EXTS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">".jpg"</span><span class="p">,</span> <span class="s2">".jpeg"</span><span class="p">,</span> <span class="s2">".png"</span><span class="p">,</span> <span class="s2">".bmp"</span><span class="p">,</span> <span class="s2">".webp"</span><span class="p">}</span>
@@ -8223,7 +8282,7 @@ con las rutas de <code>config.yaml</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=eebdc2bf">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8235,16 +8294,19 @@ con las rutas de <code>config.yaml</code>.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">roboflow</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">roboflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">Roboflow</span>
 
-<span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ROBOFLOW_API_KEY"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">"Roboflow API key: "</span><span class="p">)</span>
-<span class="n">rf</span> <span class="o">=</span> <span class="n">Roboflow</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
 <span class="n">rf_versions</span><span class="p">,</span> <span class="n">RAW_DIRS</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DATASETS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">v</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">workspace</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">])</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"project"</span><span class="p">])</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"version"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">"carpeta"</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>                       <span class="c1"># carpeta local: no se descarga nada</span>
+        <span class="n">RAW_DIRS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"carpeta"</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">RAW_DIRS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"data.yaml"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: falta data.yaml en </span><span class="si">{</span><span class="n">RAW_DIRS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">continue</span>
+    <span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ROBOFLOW_API_KEY"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s2">"Roboflow API key: "</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">Roboflow</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span><span class="o">.</span><span class="n">workspace</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"workspace"</span><span class="p">])</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"project"</span><span class="p">])</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"version"</span><span class="p">])</span>
+    <span class="k">del</span> <span class="n">api_key</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">"format"</span><span class="p">],</span> <span class="n">location</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">DATA_RAW</span> <span class="o">/</span> <span class="n">key</span><span class="p">),</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">rf_versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">RAW_DIRS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
     <span class="n">RUN_RECORD</span><span class="p">[</span><span class="s2">"datasets"</span><span class="p">][</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"downloaded"</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s2">"seconds"</span><span class="p">),</span>
                                         <span class="s2">"location"</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">location</span><span class="p">})</span>
-<span class="k">del</span> <span class="n">api_key</span>
 <span class="n">RUN_RECORD</span><span class="p">[</span><span class="s2">"roboflow_pkg"</span><span class="p">]</span> <span class="o">=</span> <span class="n">roboflow</span><span class="o">.</span><span class="n">__version__</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">RAW_DIRS</span><span class="p">)</span>
 </pre></div>
@@ -8293,7 +8355,7 @@ con las rutas de <code>config.yaml</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=72c85f57">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8308,7 +8370,7 @@ con las rutas de <code>config.yaml</code>.</p>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"===== </span><span class="si">{</span><span class="n">readme</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> ====="</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">readme</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"license"</span><span class="p">,</span> <span class="s2">"preprocessing"</span><span class="p">,</span> <span class="s2">"augmentation"</span><span class="p">,</span> <span class="s2">"splits"</span><span class="p">,</span> <span class="s2">"images"</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rf_versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rf_versions</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rf_versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">attr</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="s2">"-&gt;"</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">rf_versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">attr</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -8414,7 +8476,7 @@ images -&gt; 6766
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ba3c9840">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8427,8 +8489,7 @@ images -&gt; 6766
 <span class="c1"># ("videoplayback.mp4" y "190921_SonyClip#1_ParcelaI_visitas.mp4"): la licencia no acredita los derechos de esos videos.</span>
 <span class="c1"># También se pueden pasar como variables de entorno LICENSE_DS1 / LICENSE_DS2 (útil con run_pipeline.py).</span>
 <span class="c1"># ds2 declara "CC BY 4.0": exige citar el dataset y su autor en la documentación del proyecto.</span>
-<span class="n">LICENSE_CONFIRMED</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"ds1"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"LICENSE_DS1"</span><span class="p">),</span>   <span class="c1"># p. ej. "MIT (declarada en Roboflow; procedencia de videos sin verificar)"</span>
-                     <span class="s2">"ds2"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"LICENSE_DS2"</span><span class="p">)}</span>   <span class="c1"># p. ej. "CC BY 4.0, atribución en README del proyecto"</span>
+<span class="n">LICENSE_CONFIRMED</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LICENSE_</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"licencia"</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">DATASETS</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">LICENSE_CONFIRMED</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="s2">"Gate CA-01.4.2: registra la licencia verificada de cada dataset."</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">lic</span> <span class="ow">in</span> <span class="n">LICENSE_CONFIRMED</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="n">RUN_RECORD</span><span class="p">[</span><span class="s2">"datasets"</span><span class="p">][</span><span class="n">k</span><span class="p">][</span><span class="s2">"license"</span><span class="p">]</span> <span class="o">=</span> <span class="n">lic</span>
@@ -8438,7 +8499,7 @@ images -&gt; 6766
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c2a45de">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8448,7 +8509,7 @@ images -&gt; 6766
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=db1ba3be">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8507,13 +8568,13 @@ images -&gt; 6766
                 <span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
             <span class="n">labels</span> <span class="o">=</span> <span class="n">read_labels</span><span class="p">(</span><span class="n">lbl_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.txt"</span><span class="p">)</span>
             <span class="n">stem</span> <span class="o">=</span> <span class="n">original_stem</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
-            <span class="n">src</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">video_frame</span><span class="p">(</span><span class="n">stem</span><span class="p">)</span> <span class="k">if</span> <span class="n">DATASETS</span><span class="p">[</span><span class="n">ds</span><span class="p">][</span><span class="s2">"stretched_from_16_9"</span><span class="p">]</span> <span class="k">else</span> <span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2">_foto"</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">src</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">video_frame</span><span class="p">(</span><span class="n">stem</span><span class="p">)</span> <span class="k">if</span> <span class="n">DATASETS</span><span class="p">[</span><span class="n">ds</span><span class="p">][</span><span class="s2">"frames_video"</span><span class="p">]</span> <span class="k">else</span> <span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2">_foto"</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">img_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="n">stem</span><span class="o">=</span><span class="n">stem</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">H</span><span class="p">,</span>
                                  <span class="n">n_boxes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)))</span>
             <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
                 <span class="n">box_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="bp">cls</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">cx</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">cy</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">,</span>
                                      <span class="n">area</span><span class="o">=</span><span class="n">w</span> <span class="o">*</span> <span class="n">h</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">H</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">),</span> <span class="n">w_px</span><span class="o">=</span><span class="n">w</span> <span class="o">*</span> <span class="n">W</span><span class="p">,</span> <span class="n">h_px</span><span class="o">=</span><span class="n">h</span> <span class="o">*</span> <span class="n">H</span><span class="p">,</span>
-                                     <span class="n">aspect_orig</span><span class="o">=</span><span class="p">((</span><span class="n">w</span> <span class="o">*</span> <span class="n">ORIG_ASPECT</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">DATASETS</span><span class="p">[</span><span class="n">ds</span><span class="p">][</span><span class="s2">"stretched_from_16_9"</span><span class="p">]</span> <span class="ow">and</span> <span class="n">W</span> <span class="o">==</span> <span class="n">H</span><span class="p">)</span>
+                                     <span class="n">aspect_orig</span><span class="o">=</span><span class="p">((</span><span class="n">w</span> <span class="o">*</span> <span class="n">ORIG_ASPECT</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">DATASETS</span><span class="p">[</span><span class="n">ds</span><span class="p">][</span><span class="s2">"stretched"</span><span class="p">]</span> <span class="ow">and</span> <span class="n">W</span> <span class="o">==</span> <span class="n">H</span><span class="p">)</span>
                                      <span class="k">else</span> <span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">H</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)))</span>   <span class="c1"># aspecto real (ds2 estirado: no recuperable)</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">img_rows</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">box_rows</span><span class="p">)</span>
 
@@ -9233,7 +9294,7 @@ ds2 clases: {0: 'colibri'}
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ee7a656e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9275,7 +9336,7 @@ ds2 clases: {0: 'colibri'}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3be1f40f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9285,7 +9346,7 @@ ds2 clases: {0: 'colibri'}
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f7d15945">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9335,28 +9396,28 @@ ds2 clases: {0: 'colibri'}
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[imagen de dataset omitida: no se redistribuye; se ve al ejecutar el notebook]
+<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[imagen de dataset omitida: no se redistribuye; se ve al ejecutar el notebook]
+<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[imagen de dataset omitida: no se redistribuye; se ve al ejecutar el notebook]
+<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7c6b2db1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9366,7 +9427,7 @@ ds2 clases: {0: 'colibri'}
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9950123d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9396,10 +9457,10 @@ ds2 clases: {0: 'colibri'}
 <span class="n">imgs</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">imgs</span><span class="p">[</span><span class="s2">"gap_to_train"</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_gap_to</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="s2">"split"</span><span class="p">)</span>
 <span class="c1"># Solo ds1 son frames de video; en ds2 (fotos) la auditoría por embeddings dio 0,8 % de casi-duplicados entre splits.</span>
-<span class="n">ev</span> <span class="o">=</span> <span class="n">imgs</span><span class="p">[(</span><span class="n">imgs</span><span class="o">.</span><span class="n">ds</span> <span class="o">==</span> <span class="s2">"ds1"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">imgs</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">])]</span>
+<span class="n">ev</span> <span class="o">=</span> <span class="n">imgs</span><span class="p">[</span><span class="n">imgs</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">VIDEO_DS</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">imgs</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">])]</span>
 <span class="n">leaks</span> <span class="o">=</span> <span class="n">ev</span><span class="p">[</span><span class="n">ev</span><span class="o">.</span><span class="n">gap_to_train</span> <span class="o">&lt;=</span> <span class="n">LEAK_GAP_FRAMES</span><span class="p">]</span>
 <span class="n">leaky_groups</span> <span class="o">=</span> <span class="n">leaks</span><span class="o">.</span><span class="n">index</span>          <span class="c1"># se mantiene el nombre que usa la sección 4</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ds1: valid/test a &lt;= </span><span class="si">{</span><span class="n">LEAK_GAP_FRAMES</span><span class="si">}</span><span class="s2"> frames de train: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">leaks</span><span class="p">)</span><span class="si">}</span><span class="s2"> de </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">leaks</span><span class="p">)</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ev</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">VIDEO_DS</span><span class="si">}</span><span class="s2">: valid/test a &lt;= </span><span class="si">{</span><span class="n">LEAK_GAP_FRAMES</span><span class="si">}</span><span class="s2"> frames de train: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">leaks</span><span class="p">)</span><span class="si">}</span><span class="s2"> de </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">leaks</span><span class="p">)</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ev</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"split"</span><span class="p">)</span><span class="o">.</span><span class="n">gap_to_train</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
 <span class="c1"># Diagnóstico visual: un frame de test junto a sus vecinos de train</span>
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">leaks</span><span class="p">):</span>
@@ -9418,7 +9479,7 @@ ds2 clases: {0: 'colibri'}
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>ds1: valid/test a &lt;= 15 frames de train: 197 de 197 (100%)
+<pre>['ds1']: valid/test a &lt;= 15 frames de train: 197 de 197 (100%)
 </pre>
 </div>
 </div>
@@ -9495,14 +9556,14 @@ ds2 clases: {0: 'colibri'}
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[imagen de dataset omitida: no se redistribuye; se ve al ejecutar el notebook]
+<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=526fcefa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9518,7 +9579,7 @@ y se descartan de valid/test los frames a menos de <code>GUARD_FRAMES</code> de 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dd1a3ac8">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=17">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9560,12 +9621,13 @@ y se descartan de valid/test los frames a menos de <code>GUARD_FRAMES</code> de 
         <span class="n">out</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">block</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">best</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">out</span>
 
-<span class="n">v1</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">ds</span> <span class="o">==</span> <span class="s2">"ds1"</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">VIDEO_DS</span><span class="p">)</span>
 <span class="n">sizes</span> <span class="o">=</span> <span class="n">imgs</span><span class="p">[</span><span class="n">v1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 <span class="n">use_original</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">leaky_groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">sizes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">MIN_EVAL_IMAGES</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">))</span>
 <span class="n">imgs</span><span class="p">[</span><span class="s2">"block"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="n">imgs</span><span class="p">[</span><span class="s2">"final_split"</span><span class="p">]</span> <span class="o">=</span> <span class="n">imgs</span><span class="p">[</span><span class="s2">"split"</span><span class="p">]</span>          <span class="c1"># ds2: distribución original</span>
-<span class="n">imgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">v1</span><span class="p">,</span> <span class="s2">"block"</span><span class="p">]</span> <span class="o">=</span> <span class="n">temporal_blocks</span><span class="p">(</span><span class="n">imgs</span><span class="p">[</span><span class="n">v1</span><span class="p">])</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">use_original</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+    <span class="n">imgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">v1</span><span class="p">,</span> <span class="s2">"block"</span><span class="p">]</span> <span class="o">=</span> <span class="n">temporal_blocks</span><span class="p">(</span><span class="n">imgs</span><span class="p">[</span><span class="n">v1</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">use_original</span><span class="p">:</span>
     <span class="n">imgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">v1</span><span class="p">,</span> <span class="s2">"final_split"</span><span class="p">]</span> <span class="o">=</span> <span class="n">block_split</span><span class="p">(</span><span class="n">imgs</span><span class="p">[</span><span class="n">v1</span><span class="p">],</span> <span class="n">RESPLIT_RATIOS</span><span class="p">,</span> <span class="n">SEED</span><span class="p">)</span>
 
 <span class="c1"># Banda de guarda: fuera de valid/test lo que quede a &lt;= GUARD_FRAMES de train</span>
@@ -9588,7 +9650,7 @@ y se descartan de valid/test los frames a menos de <code>GUARD_FRAMES</code> de 
 <span class="n">display</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">([</span><span class="n">imgs</span><span class="o">.</span><span class="n">ds</span><span class="p">,</span> <span class="n">imgs</span><span class="o">.</span><span class="n">src</span><span class="p">,</span> <span class="n">imgs</span><span class="o">.</span><span class="n">split</span><span class="p">],</span> <span class="n">imgs</span><span class="o">.</span><span class="n">final_split</span><span class="p">,</span> <span class="n">margins</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 <span class="k">assert</span> <span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">v1</span> <span class="o">&amp;</span> <span class="n">imgs</span><span class="o">.</span><span class="n">final_split</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">]),</span> <span class="s2">"gap_final"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">GUARD_FRAMES</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">):</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">v1</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">final_split</span> <span class="o">==</span> <span class="n">s</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">MIN_EVAL_IMAGES</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v1</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">final_split</span> <span class="o">==</span> <span class="n">s</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">MIN_EVAL_IMAGES</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Aviso: </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> tiene menos de </span><span class="si">{</span><span class="n">MIN_EVAL_IMAGES</span><span class="si">}</span><span class="s2"> imágenes; ajusta CHUNK_IMAGES o GUARD_FRAMES y documenta."</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -9742,7 +9804,7 @@ y se descartan de valid/test los frames a menos de <code>GUARD_FRAMES</code> de 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e0c86efd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9753,7 +9815,7 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=57af9b73">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=19">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9773,7 +9835,7 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
         <span class="p">(</span><span class="n">dst</span> <span class="o">/</span> <span class="n">r</span><span class="o">.</span><span class="n">final_split</span> <span class="o">/</span> <span class="s2">"labels"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">out_img</span> <span class="o">=</span> <span class="n">dst</span> <span class="o">/</span> <span class="n">r</span><span class="o">.</span><span class="n">final_split</span> <span class="o">/</span> <span class="s2">"images"</span> <span class="o">/</span> <span class="n">out_name</span>
         <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">src</span><span class="p">)</span> <span class="k">as</span> <span class="n">im</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">UNSTRETCH_SIZE</span> <span class="ow">and</span> <span class="n">DATASETS</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">ds</span><span class="p">][</span><span class="s2">"stretched_from_16_9"</span><span class="p">]</span> <span class="ow">and</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">UNSTRETCH_SIZE</span> <span class="ow">and</span> <span class="n">DATASETS</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">ds</span><span class="p">][</span><span class="s2">"stretched"</span><span class="p">]</span> <span class="ow">and</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="c1"># deshace el "Stretch to 640x640": mismo aspecto 16:9 que el video, que YOLO letterboxea en inferencia</span>
                 <span class="n">im</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">"RGB"</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">UNSTRETCH_SIZE</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BICUBIC</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_img</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="mi">95</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -9793,7 +9855,7 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
 
 <span class="n">DATA_YAML</span><span class="p">,</span> <span class="n">DATASET_DIGEST</span> <span class="o">=</span> <span class="n">materialize</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">DATA_FINAL</span><span class="p">,</span> <span class="n">CLASS_NAMES</span><span class="p">)</span>
 <span class="c1"># Ablación (ds2 solo) para medir si los frames de video de ds1 aportan en la prueba propia</span>
-<span class="n">DATA_YAML_DS2</span><span class="p">,</span> <span class="n">DIGEST_DS2</span> <span class="o">=</span> <span class="n">materialize</span><span class="p">(</span><span class="n">imgs</span><span class="p">[</span><span class="n">imgs</span><span class="o">.</span><span class="n">ds</span> <span class="o">==</span> <span class="s2">"ds2"</span><span class="p">],</span> <span class="n">WORK</span> <span class="o">/</span> <span class="s2">"final_ds2"</span><span class="p">,</span> <span class="n">CLASS_NAMES</span><span class="p">)</span>
+<span class="n">DATA_YAML_DS2</span><span class="p">,</span> <span class="n">DIGEST_DS2</span> <span class="o">=</span> <span class="n">materialize</span><span class="p">(</span><span class="n">imgs</span><span class="p">[</span><span class="n">imgs</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">FOTO_DS</span><span class="p">)],</span> <span class="n">WORK</span> <span class="o">/</span> <span class="s2">"final_ds2"</span><span class="p">,</span> <span class="n">CLASS_NAMES</span><span class="p">)</span> <span class="k">if</span> <span class="n">FOTO_DS</span> <span class="ow">and</span> <span class="n">VIDEO_DS</span> <span class="k">else</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="n">RUN_RECORD</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"splits"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"split_decision"</span><span class="p">:</span> <span class="n">SPLIT_DECISION</span><span class="p">,</span> <span class="s2">"final_yaml"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">DATA_YAML</span><span class="p">),</span>
                               <span class="s2">"manifest_sha1"</span><span class="p">:</span> <span class="n">DATASET_DIGEST</span><span class="p">,</span> <span class="s2">"manifest_sha1_ds2"</span><span class="p">:</span> <span class="n">DIGEST_DS2</span><span class="p">,</span> <span class="s2">"review_notes"</span><span class="p">:</span> <span class="n">REVIEW_NOTES</span><span class="p">})</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">DATA_YAML</span><span class="p">,</span> <span class="n">DATASET_DIGEST</span><span class="p">)</span>
@@ -9815,7 +9877,7 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cb37a10a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9824,7 +9886,7 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">ref_rr</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"resultados"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"S1_datos"</span> <span class="o">/</span> <span class="s2">"run_record.json"</span>
-<span class="k">if</span> <span class="n">ref_rr</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<span class="k">if</span> <span class="n">ref_rr</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">set</span><span class="p">(</span><span class="n">DATASETS</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"ds1"</span><span class="p">,</span> <span class="s2">"ds2"</span><span class="p">}:</span>   <span class="c1"># la referencia de S1 solo vale para los datasets del proyecto</span>
     <span class="n">rr</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">ref_rr</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">))</span>
     <span class="n">s1</span> <span class="o">=</span> <span class="n">rr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"splits"</span><span class="p">,</span> <span class="p">{})</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">mine</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"manifest_sha1"</span><span class="p">,</span> <span class="n">DATASET_DIGEST</span><span class="p">),</span> <span class="p">(</span><span class="s2">"manifest_sha1_ds2"</span><span class="p">,</span> <span class="n">DIGEST_DS2</span><span class="p">)):</span>
@@ -9850,26 +9912,27 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[13]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>1775</pre>
+<pre>1744</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7f4faeff">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-Prueba-vv-(S1-S2)">5. Prueba vv (S1-S2)<a class="anchor-link" href="#5.-Prueba-vv-(S1-S2)">¶</a></h2><p>247 frames de vv01-vv03 (cada 8 o 5 frames, <code>datos_derivados/vv/manifest_frames.csv</code>) con las etiquetas corregidas
+<h2 id="5.-Prueba-vv-(S1-S2)">5. Prueba vv (S1-S2)<a class="anchor-link" href="#5.-Prueba-vv-(S1-S2)">¶</a></h2><p><em>Secciones 5 y 6: solo con <code>regenerar_humming: true</code> en <code>config.yaml</code>; necesitan los videos del proyecto.</em></p>
+<p>247 frames de vv01-vv03 (cada 8 o 5 frames, <code>datos_derivados/vv/manifest_frames.csv</code>) con las etiquetas corregidas
 en Roboflow (<code>prueba_etiquetas_corregidas.zip</code>): 174 cajas y 73 frames vacíos. Se excluyen 4 frames de vv02
 (<code>ignorar_frames.txt</code>) donde solo asoma el pico o el ala. Fue la prueba de decisión de S2 (D-05) hasta que D-07 pasó
 vv a entrenamiento. Sustituye a <code>build_video_test</code>, que necesitaba los zips de frames.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4ba05506">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=22">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9908,21 +9971,22 @@ vv a entrenamiento. Sustituye a <code>build_video_test</code>, que necesitaba lo
         <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">destino</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nombre</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="si">}</span><span class="s2">.jpg"</span><span class="p">),</span> <span class="n">fr</span><span class="p">,</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">IMWRITE_JPEG_QUALITY</span><span class="p">,</span> <span class="mi">95</span><span class="p">])</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span> <span class="k">if</span> <span class="p">(</span><span class="n">destino</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nombre</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">.jpg"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
-<span class="n">TEST_VIDEO</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"frames"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"vv_prueba"</span>
-<span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">VV</span> <span class="o">/</span> <span class="s2">"prueba_etiquetas_corregidas.zip"</span><span class="p">)</span> <span class="k">as</span> <span class="n">z</span><span class="p">:</span>
-    <span class="n">IGNORAR_VV</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"ignorar_frames.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
-    <span class="n">ETQ_VV</span> <span class="o">=</span> <span class="p">{</span><span class="n">Path</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"labels/"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".txt"</span><span class="p">)}</span>
-<span class="n">MF</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">VV</span> <span class="o">/</span> <span class="s2">"manifest_frames.csv"</span><span class="p">)</span>
-<span class="n">MF</span><span class="p">[</span><span class="s2">"stem"</span><span class="p">]</span> <span class="o">=</span> <span class="n">MF</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">".jpg"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">MF</span> <span class="o">=</span> <span class="n">MF</span><span class="p">[</span><span class="o">~</span><span class="n">MF</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">IGNORAR_VV</span><span class="p">)]</span>
-<span class="p">(</span><span class="n">TEST_VIDEO</span> <span class="o">/</span> <span class="s2">"labels"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">MF</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video_id"</span><span class="p">):</span>
-    <span class="n">ok</span> <span class="o">=</span> <span class="n">regenerar</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">vid</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">vid</span><span class="si">}</span><span class="s2">_f</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">TEST_VIDEO</span> <span class="o">/</span> <span class="s2">"images"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ok</span><span class="p">),</span> <span class="s2">"de"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="s2">"frames"</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MF</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span>
-    <span class="p">(</span><span class="n">TEST_VIDEO</span> <span class="o">/</span> <span class="s2">"labels"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">ETQ_VV</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"prueba vv:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">MF</span><span class="p">),</span> <span class="s2">"frames,"</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ETQ_VV</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">//</span> <span class="mi">5</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MF</span><span class="o">.</span><span class="n">stem</span><span class="p">),</span> <span class="s2">"cajas (esperado 243 frames y 174 cajas menos las de los ignorados)"</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">REGENERAR</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+    <span class="n">TEST_VIDEO</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"frames"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"vv_prueba"</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">VV</span> <span class="o">/</span> <span class="s2">"prueba_etiquetas_corregidas.zip"</span><span class="p">)</span> <span class="k">as</span> <span class="n">z</span><span class="p">:</span>
+        <span class="n">IGNORAR_VV</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"ignorar_frames.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">ETQ_VV</span> <span class="o">=</span> <span class="p">{</span><span class="n">Path</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"labels/"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".txt"</span><span class="p">)}</span>
+    <span class="n">MF</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">VV</span> <span class="o">/</span> <span class="s2">"manifest_frames.csv"</span><span class="p">)</span>
+    <span class="n">MF</span><span class="p">[</span><span class="s2">"stem"</span><span class="p">]</span> <span class="o">=</span> <span class="n">MF</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">".jpg"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">MF</span> <span class="o">=</span> <span class="n">MF</span><span class="p">[</span><span class="o">~</span><span class="n">MF</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">IGNORAR_VV</span><span class="p">)]</span>
+    <span class="p">(</span><span class="n">TEST_VIDEO</span> <span class="o">/</span> <span class="s2">"labels"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">MF</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video_id"</span><span class="p">):</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">regenerar</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">vid</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">vid</span><span class="si">}</span><span class="s2">_f</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">TEST_VIDEO</span> <span class="o">/</span> <span class="s2">"images"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ok</span><span class="p">),</span> <span class="s2">"de"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="s2">"frames"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MF</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">TEST_VIDEO</span> <span class="o">/</span> <span class="s2">"labels"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">ETQ_VV</span><span class="p">[</span><span class="n">s</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"prueba vv:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">MF</span><span class="p">),</span> <span class="s2">"frames,"</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ETQ_VV</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">//</span> <span class="mi">5</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">MF</span><span class="o">.</span><span class="n">stem</span><span class="p">),</span> <span class="s2">"cajas (esperado 243 frames y 174 cajas menos las de los ignorados)"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -9938,14 +10002,20 @@ vv a entrenamiento. Sustituye a <code>build_video_test</code>, que necesitaba lo
 <pre>vv01_adobe1294608945 96 de 96 frames
 vv02_adobe512464022 95 de 95 frames
 vv03_florisuga_file 52 de 52 frames
-prueba vv: 243 frames, 174 cajas (esperado 243 frames y 174 cajas menos las de los ignorados)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>prueba vv: 243 frames, 174 cajas (esperado 243 frames y 174 cajas menos las de los ignorados)
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ea3946a1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -9968,7 +10038,7 @@ train/valid; humming se repite ×3 en <code>train_ft.txt</code> junto a ds2+ds1.
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ade86dbc">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=24">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -10007,10 +10077,11 @@ train/valid; humming se repite ×3 en <code>train_ft.txt</code> junto a ds2+ds1.
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"listas </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">: train_ft </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">old_train</span><span class="p">)</span><span class="si">}</span><span class="s2"> ds2+ds1 + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">listed</span><span class="p">(</span><span class="s1">'train'</span><span class="p">))</span><span class="si">}</span><span class="s2"> humming x</span><span class="si">{</span><span class="n">OVERSAMPLE</span><span class="si">}</span><span class="s2">; "</span>
           <span class="sa">f</span><span class="s2">"val_ft </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">old_val</span><span class="p">)</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">listed</span><span class="p">(</span><span class="s1">'valid'</span><span class="p">))</span><span class="si">}</span><span class="s2">; test_video </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">listed</span><span class="p">(</span><span class="s1">'test'</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-<span class="n">HUM</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"v1"</span><span class="p">,</span> <span class="s2">"v2"</span><span class="p">):</span>
-    <span class="n">HUM</span><span class="p">[</span><span class="n">version</span><span class="p">]</span> <span class="o">=</span> <span class="n">materializar_humming</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
-    <span class="n">listas</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">HUM</span><span class="p">[</span><span class="n">version</span><span class="p">])</span>
+<span class="k">if</span> <span class="n">REGENERAR</span><span class="p">:</span>
+    <span class="n">HUM</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"v1"</span><span class="p">,</span> <span class="s2">"v2"</span><span class="p">):</span>
+        <span class="n">HUM</span><span class="p">[</span><span class="n">version</span><span class="p">]</span> <span class="o">=</span> <span class="n">materializar_humming</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+        <span class="n">listas</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">HUM</span><span class="p">[</span><span class="n">version</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -10039,7 +10110,7 @@ listas v2: train_ft 5178 ds2+ds1 + 299 humming x3; val_ft 1436 + 79; test_video 
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e39c8242">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -10052,7 +10123,7 @@ video no valen para esa copia.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=136bbf74">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=26">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -10066,19 +10137,20 @@ video no valen para esa copia.</p>
     <span class="n">g</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_AREA</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"1"</span> <span class="k">if</span> <span class="n">x</span> <span class="k">else</span> <span class="s2">"0"</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">g</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">&gt;</span> <span class="n">g</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()),</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">version</span><span class="p">,</span> <span class="n">raiz</span> <span class="ow">in</span> <span class="n">ORIGINALES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">raiz</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">: no hay originales en </span><span class="si">{</span><span class="n">raiz</span><span class="si">}</span><span class="s2">; se omite"</span><span class="p">);</span> <span class="k">continue</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)),</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">HUM</span><span class="p">[</span><span class="n">version</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video_id"</span><span class="p">)])</span>  <span class="c1"># pandas 3: apply() ya no pasa la columna de agrupación</span>
-    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
-        <span class="n">o</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raiz</span> <span class="o">/</span> <span class="n">r</span><span class="o">.</span><span class="n">split</span> <span class="o">/</span> <span class="s2">"images"</span> <span class="o">/</span> <span class="n">r</span><span class="o">.</span><span class="n">imagen</span><span class="o">.</span><span class="n">name</span><span class="p">));</span> <span class="n">n</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">imagen</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">o</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">o</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">n</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">video</span><span class="o">=</span><span class="n">corto</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">video_id</span><span class="p">),</span> <span class="n">frame</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">ok</span><span class="o">=</span><span class="kc">False</span><span class="p">));</span> <span class="k">continue</span>
-        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">video</span><span class="o">=</span><span class="n">corto</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">video_id</span><span class="p">),</span> <span class="n">frame</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">dif_media</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">absdiff</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span>
-                         <span class="n">dhash</span><span class="o">=</span><span class="nb">bin</span><span class="p">(</span><span class="n">dhash</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">^</span> <span class="n">dhash</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"1"</span><span class="p">)))</span>
-    <span class="n">V</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">);</span> <span class="n">V</span><span class="p">[</span><span class="s2">"ok"</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dhash"</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">ok</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="si">}</span><span class="s2"> de </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">V</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames coinciden"</span><span class="p">);</span> <span class="n">display</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video"</span><span class="p">)[[</span><span class="s2">"dif_media"</span><span class="p">,</span> <span class="s2">"dhash"</span><span class="p">]]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">REGENERAR</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">version</span><span class="p">,</span> <span class="n">raiz</span> <span class="ow">in</span> <span class="n">ORIGINALES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">raiz</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">: no hay originales en </span><span class="si">{</span><span class="n">raiz</span><span class="si">}</span><span class="s2">; se omite"</span><span class="p">);</span> <span class="k">continue</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">g</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)),</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">HUM</span><span class="p">[</span><span class="n">version</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video_id"</span><span class="p">)])</span>  <span class="c1"># pandas 3: apply() ya no pasa la columna de agrupación</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">raiz</span> <span class="o">/</span> <span class="n">r</span><span class="o">.</span><span class="n">split</span> <span class="o">/</span> <span class="s2">"images"</span> <span class="o">/</span> <span class="n">r</span><span class="o">.</span><span class="n">imagen</span><span class="o">.</span><span class="n">name</span><span class="p">));</span> <span class="n">n</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">imagen</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">o</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">o</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">n</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">video</span><span class="o">=</span><span class="n">corto</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">video_id</span><span class="p">),</span> <span class="n">frame</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">ok</span><span class="o">=</span><span class="kc">False</span><span class="p">));</span> <span class="k">continue</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">video</span><span class="o">=</span><span class="n">corto</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">video_id</span><span class="p">),</span> <span class="n">frame</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">dif_media</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">absdiff</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span>
+                             <span class="n">dhash</span><span class="o">=</span><span class="nb">bin</span><span class="p">(</span><span class="n">dhash</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">^</span> <span class="n">dhash</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"1"</span><span class="p">)))</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">);</span> <span class="n">V</span><span class="p">[</span><span class="s2">"ok"</span><span class="p">]</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dhash"</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">ok</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="si">}</span><span class="s2"> de </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">V</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames coinciden"</span><span class="p">);</span> <span class="n">display</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video"</span><span class="p">)[[</span><span class="s2">"dif_media"</span><span class="p">,</span> <span class="s2">"dhash"</span><span class="p">]]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -10297,7 +10369,7 @@ video no valen para esa copia.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1637688e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

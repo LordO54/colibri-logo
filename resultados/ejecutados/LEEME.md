@@ -38,3 +38,22 @@ desfase de índice. Script en `frames_check.py`.
 
 El notebook 01 no descargó porque `raw/` ya estaba copiado. Una descarga aparte es idéntica byte a byte a esa copia
 (ds1 1267 archivos, ds2 13535, 0 distintos).
+
+## Herramienta (`herramienta_trayectorias`, 05-nov-2026)
+
+Prueba de punta a punta con i5bE, con el tracking y los mapas de profundidad rehechos y las regiones del notebook 06:
+
+| Paso | Frente a | Diferencia máxima |
+|---|---|---|
+| Trayectoria (440 filas) | S5 | 0 px y 0 en `segment_id` |
+| 7 puntos `b_salientes` | S7 | 0 px |
+| `z_norm` `b_salientes` | S8 | 0 |
+
+**La resolución de entrada de VDA importa.** Con 448 en vez de 392, la de S8, `z_norm` cambia hasta 0,46 en el punto 2 de
+i5bE y hasta 0,06 en los demás. Por eso la fija `config.yaml` → `vda.sizes`.
+
+En un clon limpio, sin `.env`, también funcionaron: la herramienta en 2D con un video bajado por URL (Gu30), y un dataset propio
+en carpeta local a través de 01 y 02 (muestra de 100 imágenes, 1 época; solo prueba que el flujo corre, no la calidad).
+No se probó con un video ajeno al proyecto, ni un entrenamiento completo, ni una instalación en un equipo nuevo.
+
+Los HTML de 01 a 06 se regeneraron tras estos cambios. De 01 y 06 se omiten las figuras con imágenes de dataset o cuadros de video.

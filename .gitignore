@@ -22,10 +22,10 @@ __pycache__/
 runs/
 datos/
 
-# Pesos: solo el vigente va en git
+# Pesos: en git solo los detectores publicados en modelos/<nombre>/ (ver modelos/README.md)
 *.pt
 *.pth
-!modelos/yolo26n_ft_v2/best.pt
+!modelos/*/best.pt
 
 # Imágenes de datasets (las figuras de resultados sí se versionan)
 datos_derivados/**/*.jpg

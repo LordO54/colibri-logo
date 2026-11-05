@@ -9,6 +9,8 @@ rutas:                                 # relativas a zona_trabajo
   frames: datos/frames                 # frames regenerados desde los videos (humming v1/v2, prueba vv)
   runs: runs                           # salidas crudas: Ultralytics, tracking, profundidad
   modelos: modelos                     # pesos que no van en git y repos externos (Video-Depth-Anything)
+  mis_videos: datos/mis_videos         # herramienta: pon aquí tus videos
+  herramienta: runs/herramienta        # herramienta: salidas por video
 
 # Modo por defecto de todos los notebooks:
 #   artefactos -> usa los modelos y CSV congelados, recalcula las métricas y las compara con las del sprint
@@ -23,9 +25,17 @@ vigente:                               # docs/decisiones.md
   puntos: 7                                        # D-12: 7 en total por video
   profundidad: {backend: vda, modelo: vda-small}   # D-17/D-18: solo como exploración (SP-02.9 pendiente)
 
-roboflow:                              # la clave va en .env (ROBOFLOW_API_KEY), nunca aquí
-  ds1: {workspace: magic-workspace, project: hummingbird-dataset-0zvvn, version: 1}
-  ds2: {workspace: modelodevisinartificialcolibres, project: hummingbirds-detect-classify-gcm5s, version: 1}
+vda:                                   # relativo a zona_trabajo; ver entornos/instalar.md
+  repo: modelos/Video-Depth-Anything
+  checkpoint: modelos/Video-Depth-Anything/checkpoints/video_depth_anything_vits.pth
+  sizes: [392, 336, 280]               # resolución de entrada, de mayor a menor si no cabe en la GPU; 392 es la de S8
+
+# Datasets de entrenamiento: los del proyecto. Para usar los tuyos, ver notebooks/01_fuentes_y_datasets.ipynb, sección 2.
+# Cada entrada: proyecto de Roboflow (la clave va en .env, nunca aquí) o `carpeta:` local en formato YOLO.
+datasets:
+  ds1: {workspace: magic-workspace, project: hummingbird-dataset-0zvvn, version: 1, stretched: true, frames_video: true}
+  ds2: {workspace: modelodevisinartificialcolibres, project: hummingbirds-detect-classify-gcm5s, version: 1, stretched: false, frames_video: false}
+regenerar_humming: true                # false con tus datasets: 01 omite humming y vv; 02 entrena en su sección 6
 
 semilla: 42
 tolerancia:                            # diferencia admitida al comparar con las cifras del sprint

@@ -1,6 +1,9 @@
 # Guía para quien clona el repositorio
 
-Tres recorridos, de menos a más esfuerzo. Elige según lo que quieras comprobar.
+**¿Quieres trayectorias de tus propios videos?** No necesitas esta guía: usa `notebooks/herramienta_trayectorias.ipynb` (ver README).
+**¿Quieres entrenar con tu dataset?** Notebook 01, sección 2, y notebook 02, sección 6.
+
+Esta guía es para la **línea de investigación**: tres recorridos, de menos a más esfuerzo, para comprobar lo que hicimos.
 
 | Recorrido | Llegas a | Necesitas | Tiempo aprox. |
 |---|---|---|---|
