@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>06_profundidad_3d_7puntos</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>05_profundidad_vda</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7802,79 +7802,17 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="06-%C2%B7-Profundidad-en-los-7-puntos-y-revisi%C3%B3n-a-ciegas-(S8)">06 · Profundidad en los 7 puntos y revisión a ciegas (S8)<a class="anchor-link" href="#06-%C2%B7-Profundidad-en-los-7-puntos-y-revisi%C3%B3n-a-ciegas-(S8)">¶</a></h1><p><strong>Historias:</strong> SP-02.7 (spike de profundidad) → SP-02.9 (segunda prueba). <strong>Kernel:</strong> <code>colibri-yolo</code>
-(el backend <code>vda</code> solo <strong>lee</strong> los mapas que escribió el notebook 05 con el otro kernel).</p>
-<p>Para cada punto se lee la profundidad del ave en el mapa de su frame y se normaliza dentro de ese mapa (D-14):</p>
-<p><code>z_norm = (z_ave − z_flor) / (z_fondo − z_flor)</code>: 0 = flor, 1 = fondo, negativo = delante, positivo = detrás.</p>
-<table>
-<thead>
-<tr>
-<th>Backend</th>
-<th>Modelo</th>
-<th>Qué hace</th>
-<th>Dominio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>yolo26</code></td>
-<td><code>yolo26{n,s,m,l,x}-depth</code></td>
-<td>frame completo, sin memoria</td>
-<td>profundidad</td>
-</tr>
-<tr>
-<td><code>yolo26_crop</code></td>
-<td><code>yolo26s-depth</code></td>
-<td>recorte fijo con flor, recorrido y franja de fondo</td>
-<td>profundidad</td>
-</tr>
-<tr>
-<td><code>vda</code></td>
-<td><code>vda-small</code> (Apache-2.0)</td>
-<td>video completo, con consistencia temporal (notebook 05)</td>
-<td>disparidad</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Sección</th>
-<th>Qué reproduce</th>
-<th>Decisión</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1-2</td>
-<td>Lectura por punto y control de ruido</td>
-<td>D-14</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Filtro de estabilidad (fondo &lt; 5 %, autocorrelación a 0,5 s &gt; 0,5)</td>
-<td>D-13: YOLO26-Depth no sirve como z continua</td>
-</tr>
-<tr>
-<td>4</td>
-<td>Trayectoria 3D, tiras de recortes, HTML interactivo</td>
-<td>D-16: la escala de z es diseño, no medida</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Comparación con las salidas de S8</td>
-<td>—</td>
-</tr>
-<tr>
-<td>6</td>
-<td>Revisión a ciegas de i5bE (20 frames etiquetados por Yilber)</td>
-<td><strong>D-18</strong>: VDA 14/17, p = 0,013 → otra prueba</td>
-</tr>
-</tbody>
-</table>
-<p>El conjunto de puntos <code>delante</code> (D-15) está <strong>congelado</strong> en <code>datos_derivados/profundidad/</code>: se eligió por
-visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir de estadísticas de un notebook anterior.</p>
-<p><strong>No hay verdad de terreno 3D.</strong> El único juez entre backends es la revisión a ciegas (sección 6).</p>
+<h1 id="05-%C2%B7-Mapas-de-profundidad-con-Video-Depth-Anything-Small-(S8)">05 · Mapas de profundidad con Video Depth Anything Small (S8)<a class="anchor-link" href="#05-%C2%B7-Mapas-de-profundidad-con-Video-Depth-Anything-Small-(S8)">¶</a></h1><p><strong>Historia:</strong> SP-02.7 (spike de profundidad monocular). <strong>Kernel:</strong> <code>colibri</code>.</p>
+<p>Procesa el video completo dos veces (original y volteado horizontalmente) y guarda los mapas en float16 en
+<code>runs/profundidad/cache_vda/&lt;corto&gt;_{orig,flip}.npz</code> (función <code>mapas_vda</code> de <code>00_comun</code>, que también usa la herramienta), ya alineados con el frame original. El notebook 06 los lee con
+el backend <code>vda</code> de <code>00_comun</code>.</p>
+<ul>
+<li><strong>Licencia (D-17):</strong> solo el modelo Small (Apache-2.0). Base y Large son CC-BY-NC y no se usan.</li>
+<li><strong>Salida:</strong> disparidad relativa, mayor = más cerca (al revés que YOLO26-Depth).</li>
+<li><strong>Resolución:</strong> la de <code>config.yaml</code> → <code>vda.sizes</code>, de mayor a menor hasta que cabe en la GPU; la usada queda en <code>info.json</code>.
+S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_norm</code>:</strong> en i5bE, hasta 0,46 entre 448 y 392.</li>
+</ul>
+<p>En modo <code>artefactos</code> no recalcula los mapas que ya existan: los <code>.npz</code> pesan cientos de MB y no van en git.</p>
 </div>
 </div>
 </div>
@@ -7887,6 +7825,11 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">run</span> 00_comun.ipynb
+<span class="n">VIDEO_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i5bE"</span><span class="p">]</span>          <span class="c1"># cortos de datos_derivados/fuentes.csv; SP-02.9 añadirá otro video de cámara fija</span>
+<span class="n">CACHE</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"profundidad"</span> <span class="o">/</span> <span class="s2">"cache_vda"</span><span class="p">;</span> <span class="n">CACHE</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">VIDEOS</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">video_path</span><span class="p">(</span><span class="n">FUENTES</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"corto"</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">video_id</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">}</span>
+<span class="n">SIZES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VDA_SIZES"</span><span class="p">,</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">CFG</span><span class="p">[</span><span class="s2">"vda"</span><span class="p">][</span><span class="s2">"sizes"</span><span class="p">])))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">VIDEOS</span><span class="p">,</span> <span class="s2">"| sizes"</span><span class="p">,</span> <span class="n">SIZES</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7899,20 +7842,15 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
+<pre>repo D:\video_eval\colibri-logo\investigacion | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
+00_comun listo: 12 videos en fuentes.csv | detector vigente ..\modelos\yolo26n_ft_v2\best.pt existe
+{'i5bE': 'D:\\video_eval\\datos\\fuentes\\videos\\test\\test_YTDown.com_YouTube_Media_i5bEfvb5mxg_Ruby-Throated-Hummingbird-At-A-Flower-Part-2_001_1080p.mp4'} | sizes (392, 336, 280)
 </pre>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7920,70 +7858,13 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">DEPTH_BACKEND</span> <span class="o">=</span> <span class="s2">"vda"</span>     <span class="c1"># "yolo26" | "yolo26_crop" | "vda"</span>
-<span class="n">DEPTH_MODEL</span> <span class="o">=</span> <span class="s2">"vda-small"</span>         <span class="c1"># "yolo26s-depth" | "yolo26x-depth" | "vda-small"</span>
-<span class="n">VIDEO_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i5bE"</span><span class="p">]</span>             <span class="c1"># lista de videos; vda necesita haber pasado antes por vda_inferir.py</span>
-<span class="n">POINT_SETS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"b_salientes"</span><span class="p">,</span> <span class="s2">"delante"</span><span class="p">]</span>   <span class="c1"># también "a_uniforme_tiempo"; "delante" solo existe en i5bE</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ultralytics</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">spearmanr</span>
-
-<span class="n">S8</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"resultados"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"S8_exploracion_3d"</span>
-<span class="n">TRAY</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="s2">"resultados"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"S5_tracking_union_test"</span> <span class="o">/</span> <span class="s2">"trayectorias_prudente"</span><span class="p">)</span> <span class="k">if</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"artefactos"</span> <span class="k">else</span> <span class="p">(</span><span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"03"</span> <span class="o">/</span> <span class="s2">"trayectorias_prudente"</span><span class="p">)</span>
-<span class="n">P7</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="s2">"resultados"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"S7_trayectorias_2d"</span><span class="p">)</span> <span class="k">if</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"artefactos"</span> <span class="k">else</span> <span class="p">(</span><span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"04"</span><span class="p">)</span>
-<span class="n">ADOBE</span> <span class="o">=</span> <span class="n">S8</span> <span class="o">/</span> <span class="s2">"adobe"</span>                       <span class="c1"># trayectorias y 7 puntos de los clips Adobe (congelados)</span>
-<span class="n">CACHE_VDA</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"profundidad"</span> <span class="o">/</span> <span class="s2">"cache_vda"</span>   <span class="c1"># mapas del notebook 05</span>
-<span class="n">TAG</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">DEPTH_BACKEND</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">DEPTH_MODEL</span><span class="si">}</span><span class="s2">"</span>
-<span class="n">OUT</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"06"</span> <span class="o">/</span> <span class="n">TAG</span><span class="p">;</span> <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">PESOS_DEPTH</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"modelos"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"depth"</span><span class="p">;</span> <span class="n">PESOS_DEPTH</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">PESOS_DEPTH</span><span class="p">)</span>                      <span class="c1"># Ultralytics busca (y descarga) aquí los *-depth.pt</span>
-
-<span class="n">GRID</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>     <span class="c1"># IMGSZ, N_BG, MIN_MASK_PX y SMOOTH_S vienen de 00_comun</span>
-<span class="n">PATHS</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="o">.</span><span class="n">video_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">video_path</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">video_id</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">FUENTES</span><span class="o">.</span><span class="n">itertuples</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">origen</span> <span class="o">==</span> <span class="s2">"adobe_stock"</span><span class="p">}</span>
-<span class="c1"># video: clave o id, referencia (nombre, rectángulo x0, y0, x1, y1) y región de fondo lejana y estable, sin ave</span>
-<span class="n">SCENES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"i5bE"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"i5befvb5mxg"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"monarda"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.54</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.69</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"bosque desenfocado arriba"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.30</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.62</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">))),</span>
-    <span class="s2">"DoJ1"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"doj1xa6ksqm"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"flor de aloe"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.54</span><span class="p">,</span> <span class="mf">0.72</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"fondo magenta"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.72</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">))),</span>
-    <span class="s2">"Gu30"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"gu30nofexla"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"bráctea"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.36</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.70</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"ladera verde"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.68</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">))),</span>
-    <span class="s2">"J4PK"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"j4pkgwgjaus"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"tronco"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.58</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.80</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"detrás de la reja"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.09</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">))),</span>
-    <span class="s2">"A129"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"vv01_adobe1294608945"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"bráctea roja"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.60</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.71</span><span class="p">,</span> <span class="mf">0.68</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"bosque desenfocado"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.28</span><span class="p">,</span> <span class="mf">0.60</span><span class="p">))),</span>
-    <span class="s2">"A512"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"vv02_adobe512464022"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"flor tubular"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.71</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">,</span> <span class="mf">0.82</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"cielo"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">))),</span>
-    <span class="s2">"vv03"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"vv03_florisuga_file"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"flores moradas"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"fondo negro"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.96</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">))),</span>
-    <span class="s2">"A160"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"adobestock_1600207728"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"hibisco"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.60</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.78</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"bosque oscuro"</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.28</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">))),</span>
-<span class="p">}</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="n">TAG</span><span class="p">,</span> <span class="s2">"| ultralytics"</span><span class="p">,</span> <span class="n">ultralytics</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">video_info</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="n">SCENES</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">PATHS</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">PATHS</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">ADOBE</span> <span class="o">/</span> <span class="s2">"trayectorias"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"trayectoria_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">,</span> <span class="n">ADOBE</span> <span class="o">/</span> <span class="s2">"puntos7"</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">video_path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">FUENTES</span><span class="o">.</span><span class="n">video_id</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)),</span>
-            <span class="nb">next</span><span class="p">(</span><span class="n">TRAY</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"trayectoria_*</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">*.csv"</span><span class="p">)),</span> <span class="n">P7</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">load_points</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s2">"delante"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="s2">"dd"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"profundidad"</span> <span class="o">/</span> <span class="s2">"puntos_i5bE_salientes_delante.csv"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">video_info</span><span class="p">(</span><span class="n">name</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">crop_for</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">far</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-    <span class="c1"># recorte fijo a partir de la trayectoria, no de z: recorrido del ave + flor + una franja de la región de fondo</span>
-    <span class="n">o</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">~</span><span class="n">t</span><span class="o">.</span><span class="n">es_puente</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)];</span> <span class="n">ref</span> <span class="o">=</span> <span class="n">SCENES_NOW</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">o</span><span class="o">.</span><span class="n">cx_px</span> <span class="o">-</span> <span class="n">o</span><span class="o">.</span><span class="n">w_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">*</span> <span class="n">W</span><span class="p">,</span> <span class="nb">max</span><span class="p">((</span><span class="n">o</span><span class="o">.</span><span class="n">cx_px</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">w_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">ref</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="n">margin</span> <span class="o">*</span> <span class="n">W</span>
-    <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">o</span><span class="o">.</span><span class="n">cy_px</span> <span class="o">-</span> <span class="n">o</span><span class="o">.</span><span class="n">h_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">far</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">)</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">*</span> <span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">((</span><span class="n">o</span><span class="o">.</span><span class="n">cy_px</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">h_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">ref</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">)</span> <span class="o">+</span> <span class="n">margin</span> <span class="o">*</span> <span class="n">H</span>
-    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x0</span><span class="p">)),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">pendientes</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">VIDEOS</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"orig"</span><span class="p">,</span> <span class="s2">"flip"</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">.npz"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+<span class="k">if</span> <span class="n">pendientes</span> <span class="ow">or</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"recalcular"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"recalcular"</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"modo recalcular: borra a mano los .npz que quieras rehacer; los existentes no se sobrescriben"</span><span class="p">)</span>
+    <span class="n">mapas_vda</span><span class="p">(</span><span class="n">VIDEOS</span><span class="p">,</span> <span class="n">CACHE</span><span class="p">,</span> <span class="n">SIZES</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"mapas ya calculados:"</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">CACHE</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.npz"</span><span class="p">)))</span>
 </pre></div>
 </div>
 </div>
@@ -7996,20 +7877,9 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>backend vda_vda-small | ultralytics 8.4.197
+<pre>mapas ya calculados: ['i5bE_flip.npz', 'i5bE_orig.npz']
 </pre>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1.-Lectura-por-punto">1. Lectura por punto<a class="anchor-link" href="#1.-Lectura-por-punto">¶</a></h2><p>Mismas reglas para todos los backends: mediana en la máscara de movimiento (recorte central si tiene menos de 30 px), flor y fondo en el propio mapa, y el mismo control de vecinos ±2. En <code>yolo26_crop</code>, la región de fondo se recorta a lo que cae dentro del recorte.</p>
 </div>
 </div>
 </div>
@@ -8018,30 +7888,15 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">R</span><span class="p">,</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">CTX</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">:</span>
-    <span class="n">SCENES_NOW</span> <span class="o">=</span> <span class="n">SCENES</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="n">path</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">video_info</span><span class="p">(</span><span class="n">name</span><span class="p">);</span> <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">tf</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"frame"</span><span class="p">)</span>
-    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">));</span> <span class="n">fps</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">7</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">4</span><span class="p">));</span> <span class="n">bg</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-    <span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">rn</span><span class="p">,</span> <span class="n">rr</span><span class="p">),</span> <span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span> <span class="o">=</span> <span class="n">SCENES</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="n">crop</span> <span class="o">=</span> <span class="n">crop_for</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">ff</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="k">if</span> <span class="n">DEPTH_BACKEND</span> <span class="o">==</span> <span class="s2">"yolo26_crop"</span> <span class="k">else</span> <span class="kc">None</span>
-    <span class="n">be</span> <span class="o">=</span> <span class="n">make_backend</span><span class="p">(</span><span class="n">DEPTH_BACKEND</span><span class="p">,</span> <span class="n">DEPTH_MODEL</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span> <span class="n">crop</span><span class="o">=</span><span class="n">crop</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">CACHE_VDA</span><span class="p">)</span>
-    <span class="n">ref</span><span class="p">,</span> <span class="n">far</span> <span class="o">=</span> <span class="n">rect_px</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">),</span> <span class="n">rect_px</span><span class="p">(</span><span class="n">ff</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">crop</span><span class="p">:</span>   <span class="c1"># el fondo de referencia debe caer dentro del recorte</span>
-        <span class="n">far</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"recorte (px):"</span><span class="p">,</span> <span class="n">crop</span><span class="p">,</span> <span class="s2">"| fondo dentro del recorte (px):"</span><span class="p">,</span> <span class="n">far</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"| el recorte ocupa </span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">crop</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">crop</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">W</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> % del ancho"</span><span class="p">)</span>
-    <span class="n">CTX</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cap</span><span class="o">=</span><span class="n">cap</span><span class="p">,</span> <span class="n">be</span><span class="o">=</span><span class="n">be</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="n">bg</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">ref</span><span class="p">,</span> <span class="n">far</span><span class="o">=</span><span class="n">far</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">H</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">crop</span><span class="p">)</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">POINT_SETS</span><span class="p">:</span>
-        <span class="n">PT</span> <span class="o">=</span> <span class="n">load_points</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>   <span class="c1"># PT y no P: P son las rutas de 00_comun</span>
-        <span class="n">res</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">leer_puntos_z</span><span class="p">(</span><span class="n">PT</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">cap</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">bg</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">far</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
-        <span class="n">res</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"box"</span><span class="p">])</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"puntos_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">R</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">INFO</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">W</span><span class="o">=</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="o">=</span><span class="n">H</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">rr</span><span class="p">,</span> <span class="n">ref_name</span><span class="o">=</span><span class="n">rn</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"listo"</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">{}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">VIDEOS</span><span class="p">:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_orig.npz"</span><span class="p">)[</span><span class="s2">"maps"</span><span class="p">]</span>
+    <span class="n">n_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">FUENTES</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"corto"</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">"| frames esperados"</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">,</span> <span class="s2">"✓"</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_frames</span> <span class="k">else</span> <span class="s2">"✗"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8054,7 +7909,14 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>i5bE listo
+<pre>{'modelo': 'vda-small', 'input_size': {'i5bE_orig': 392, 'i5bE_flip': 392}, 'salida': 'disparidad relativa, mayor = más cerca'}
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>i5bE (601, 392, 697) float16 | frames esperados 601 ✓
 </pre>
 </div>
 </div>
@@ -8067,836 +7929,8 @@ visibilidad (no por z) con <code>historico/scripts/delante.py</code>, a partir d
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2.-Control-de-ruido">2. Control de ruido<a class="anchor-link" href="#2.-Control-de-ruido">¶</a></h2><p>Regla fijada: la forma en z no es fiable si la dispersión entre vecinos es mayor que la diferencia típica entre puntos consecutivos.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">D</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">TAG</span><span class="p">,</span> <span class="n">video</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">puntos</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">control_ruido</span><span class="p">(</span><span class="n">D</span><span class="p">)))</span>
-<span class="n">CTRL</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">);</span> <span class="n">CTRL</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"control_ruido.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"display.width"</span><span class="p">,</span> <span class="mi">220</span><span class="p">);</span> <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"display.max_columns"</span><span class="p">,</span> <span class="mi">30</span><span class="p">);</span> <span class="n">display</span><span class="p">(</span><span class="n">CTRL</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">R</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">D</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span> <span class="n">display</span><span class="p">(</span><span class="n">D</span><span class="p">[[</span><span class="s2">"punto"</span><span class="p">,</span> <span class="s2">"frame"</span><span class="p">,</span> <span class="s2">"t_s"</span><span class="p">,</span> <span class="s2">"x_norm"</span><span class="p">,</span> <span class="s2">"y_norm"</span><span class="p">,</span> <span class="s2">"z_norm"</span><span class="p">,</span> <span class="s2">"z_norm_std"</span><span class="p">,</span> <span class="s2">"vecinos_std"</span><span class="p">,</span> <span class="s2">"n_px_mascara"</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>backend</th>
-<th>video</th>
-<th>puntos</th>
-<th>dif_entre_puntos</th>
-<th>rango_z</th>
-<th>ruido_vecinos</th>
-<th>ruido_tta</th>
-<th>forma_supera_ruido</th>
-<th>recortes</th>
-<th>min_den</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>vda_vda-small</td>
-<td>i5bE</td>
-<td>b_salientes</td>
-<td>0.413</td>
-<td>1.445</td>
-<td>0.013</td>
-<td>0.041</td>
-<td>True</td>
-<td>0</td>
-<td>2.392</td>
-</tr>
-<tr>
-<th>1</th>
-<td>vda_vda-small</td>
-<td>i5bE</td>
-<td>delante</td>
-<td>0.143</td>
-<td>0.648</td>
-<td>0.018</td>
-<td>0.013</td>
-<td>True</td>
-<td>0</td>
-<td>4.376</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>i5bE b_salientes
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>punto</th>
-<th>frame</th>
-<th>t_s</th>
-<th>x_norm</th>
-<th>y_norm</th>
-<th>z_norm</th>
-<th>z_norm_std</th>
-<th>vecinos_std</th>
-<th>n_px_mascara</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>1</td>
-<td>52</td>
-<td>1.735</td>
-<td>0.597</td>
-<td>0.259</td>
-<td>0.495</td>
-<td>0.001</td>
-<td>0.009</td>
-<td>10365</td>
-</tr>
-<tr>
-<th>1</th>
-<td>2</td>
-<td>83</td>
-<td>2.769</td>
-<td>0.613</td>
-<td>0.529</td>
-<td>-0.904</td>
-<td>0.073</td>
-<td>0.480</td>
-<td>5018</td>
-</tr>
-<tr>
-<th>2</th>
-<td>3</td>
-<td>107</td>
-<td>3.570</td>
-<td>0.534</td>
-<td>0.568</td>
-<td>0.200</td>
-<td>0.042</td>
-<td>0.038</td>
-<td>12283</td>
-</tr>
-<tr>
-<th>3</th>
-<td>4</td>
-<td>125</td>
-<td>4.171</td>
-<td>0.542</td>
-<td>0.386</td>
-<td>0.407</td>
-<td>0.024</td>
-<td>0.013</td>
-<td>7712</td>
-</tr>
-<tr>
-<th>4</th>
-<td>5</td>
-<td>159</td>
-<td>5.305</td>
-<td>0.457</td>
-<td>0.398</td>
-<td>0.541</td>
-<td>0.042</td>
-<td>0.030</td>
-<td>16217</td>
-</tr>
-<tr>
-<th>5</th>
-<td>6</td>
-<td>369</td>
-<td>12.312</td>
-<td>0.531</td>
-<td>0.592</td>
-<td>-0.079</td>
-<td>0.041</td>
-<td>0.005</td>
-<td>19467</td>
-</tr>
-<tr>
-<th>6</th>
-<td>7</td>
-<td>491</td>
-<td>16.383</td>
-<td>0.707</td>
-<td>0.527</td>
-<td>0.127</td>
-<td>0.005</td>
-<td>0.009</td>
-<td>6080</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>i5bE delante
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>punto</th>
-<th>frame</th>
-<th>t_s</th>
-<th>x_norm</th>
-<th>y_norm</th>
-<th>z_norm</th>
-<th>z_norm_std</th>
-<th>vecinos_std</th>
-<th>n_px_mascara</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>1</td>
-<td>52</td>
-<td>1.735</td>
-<td>0.597</td>
-<td>0.259</td>
-<td>0.495</td>
-<td>0.001</td>
-<td>0.009</td>
-<td>10365</td>
-</tr>
-<tr>
-<th>1</th>
-<td>2</td>
-<td>111</td>
-<td>3.704</td>
-<td>0.518</td>
-<td>0.507</td>
-<td>0.325</td>
-<td>0.059</td>
-<td>0.024</td>
-<td>11010</td>
-</tr>
-<tr>
-<th>2</th>
-<td>3</td>
-<td>127</td>
-<td>4.238</td>
-<td>0.531</td>
-<td>0.369</td>
-<td>0.440</td>
-<td>0.013</td>
-<td>0.018</td>
-<td>12991</td>
-</tr>
-<tr>
-<th>3</th>
-<td>4</td>
-<td>159</td>
-<td>5.305</td>
-<td>0.457</td>
-<td>0.398</td>
-<td>0.541</td>
-<td>0.042</td>
-<td>0.030</td>
-<td>16217</td>
-</tr>
-<tr>
-<th>4</th>
-<td>5</td>
-<td>369</td>
-<td>12.312</td>
-<td>0.531</td>
-<td>0.592</td>
-<td>-0.079</td>
-<td>0.041</td>
-<td>0.005</td>
-<td>19467</td>
-</tr>
-<tr>
-<th>5</th>
-<td>6</td>
-<td>384</td>
-<td>12.813</td>
-<td>0.654</td>
-<td>0.572</td>
-<td>-0.107</td>
-<td>0.006</td>
-<td>0.020</td>
-<td>14244</td>
-</tr>
-<tr>
-<th>6</th>
-<td>7</td>
-<td>491</td>
-<td>16.383</td>
-<td>0.707</td>
-<td>0.527</td>
-<td>0.127</td>
-<td>0.005</td>
-<td>0.009</td>
-<td>6080</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3.-Filtro-de-estabilidad">3. Filtro de estabilidad<a class="anchor-link" href="#3.-Filtro-de-estabilidad">¶</a></h2><p>Sobre todos los frames observados: variación del fondo con cámara fija (celdas sin ave) y autocorrelación a 0,5 s de la lectura suavizada. El filtro fijado pide variación &lt; 5 % y autocorrelación &gt; 0,5. Se mide <code>z_ave</code> (la lectura directa, comparable con la prueba anterior) y <code>z_norm</code>. En <code>yolo26_crop</code>, las celdas son solo las que caen dentro del recorte.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cells_of</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
-    <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">;</span> <span class="n">gx</span><span class="p">,</span> <span class="n">gy</span> <span class="o">=</span> <span class="n">GRID</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">),</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">"warnings"</span><span class="p">)</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="nb">__import__</span><span class="p">(</span><span class="s2">"warnings"</span><span class="p">)</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">H</span> <span class="o">*</span> <span class="n">j</span> <span class="o">//</span> <span class="n">gy</span><span class="p">:</span><span class="n">H</span> <span class="o">*</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">gy</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="n">W</span> <span class="o">*</span> <span class="n">i</span> <span class="o">//</span> <span class="n">gx</span><span class="p">:</span><span class="n">W</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">gx</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gx</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gy</span><span class="p">)])</span>
-
-<span class="n">rows</span><span class="p">,</span> <span class="n">SERIES</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">:</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">CTX</span><span class="p">[</span><span class="n">name</span><span class="p">];</span> <span class="n">t</span><span class="p">,</span> <span class="n">be</span><span class="p">,</span> <span class="n">cap</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s2">"t"</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s2">"be"</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s2">"cap"</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s2">"W"</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s2">"H"</span><span class="p">]</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">~</span><span class="n">t</span><span class="o">.</span><span class="n">es_puente</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)];</span> <span class="n">gx</span><span class="p">,</span> <span class="n">gy</span> <span class="o">=</span> <span class="n">GRID</span><span class="p">;</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">S</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">obs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-        <span class="n">fr</span> <span class="o">=</span> <span class="n">read_frame</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">f</span><span class="p">);</span> <span class="n">box</span> <span class="o">=</span> <span class="n">box_of</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">);</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">motion_mask</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s2">"bg"</span><span class="p">],</span> <span class="o">*</span><span class="n">box</span><span class="p">);</span> <span class="n">d</span> <span class="o">=</span> <span class="n">be</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fr</span><span class="p">)</span>
-        <span class="n">o</span> <span class="o">=</span> <span class="n">read_point</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s2">"ref"</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s2">"far"</span><span class="p">]);</span> <span class="n">cm</span> <span class="o">=</span> <span class="n">cells_of</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-        <span class="n">free</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">gy</span><span class="p">,</span> <span class="n">gx</span><span class="p">),</span> <span class="nb">bool</span><span class="p">);</span> <span class="n">free</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">gy</span> <span class="o">//</span> <span class="n">H</span><span class="p">):</span><span class="nb">min</span><span class="p">(</span><span class="n">gy</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">gy</span> <span class="o">//</span> <span class="n">H</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">gx</span> <span class="o">//</span> <span class="n">W</span><span class="p">):</span><span class="nb">min</span><span class="p">(</span><span class="n">gx</span><span class="p">,</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">gx</span> <span class="o">//</span> <span class="n">W</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">free</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">));</span> <span class="n">S</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">t_s</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">t_s</span><span class="p">,</span> <span class="n">segment_id</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">segment_id</span><span class="p">,</span> <span class="n">z_ave</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s2">"z_ave"</span><span class="p">],</span> <span class="n">z_norm</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s2">"z_norm"</span><span class="p">],</span> <span class="n">z_flor</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s2">"z_flor"</span><span class="p">],</span> <span class="n">z_fondo</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="s2">"z_fondo"</span><span class="p">]))</span>
-    <span class="n">A</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">S</span><span class="p">);</span> <span class="n">S</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"serie_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span> <span class="n">SERIES</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span>
-    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">),</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">"warnings"</span><span class="p">)</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="nb">__import__</span><span class="p">(</span><span class="s2">"warnings"</span><span class="p">)</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
-        <span class="n">cv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">k</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"fps"</span><span class="p">]))</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">lag</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">SMOOTH_S</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"fps"</span><span class="p">]))</span> <span class="o">|</span> <span class="mi">1</span><span class="p">);</span> <span class="n">x</span> <span class="o">=</span> <span class="n">savgol_filter</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">w</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="n">k</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">:])</span><span class="o">.</span><span class="n">statistic</span>
-    <span class="n">jit</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">col</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">col</span><span class="p">]))[</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">95</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">5</span><span class="p">),</span> <span class="mf">1e-6</span><span class="p">))</span>
-    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">TAG</span><span class="p">,</span> <span class="n">video</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">variacion_fondo_pct</span><span class="o">=</span><span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">cv</span><span class="p">)),</span> <span class="n">autocorr_z_05s</span><span class="o">=</span><span class="n">lag</span><span class="p">(</span><span class="s2">"z_ave"</span><span class="p">),</span> <span class="n">autocorr_znorm_05s</span><span class="o">=</span><span class="n">lag</span><span class="p">(</span><span class="s2">"z_norm"</span><span class="p">),</span> <span class="n">jitter_rel_z</span><span class="o">=</span><span class="n">jit</span><span class="p">(</span><span class="s2">"z_ave"</span><span class="p">),</span> <span class="n">jitter_rel_znorm</span><span class="o">=</span><span class="n">jit</span><span class="p">(</span><span class="s2">"z_norm"</span><span class="p">),</span>
-                     <span class="n">pasa_filtro</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">cv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">lag</span><span class="p">(</span><span class="s2">"z_ave"</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)))</span>
-<span class="n">FIL</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">);</span> <span class="n">FIL</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"filtro.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span> <span class="n">display</span><span class="p">(</span><span class="n">FIL</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>backend</th>
-<th>video</th>
-<th>frames</th>
-<th>variacion_fondo_pct</th>
-<th>autocorr_z_05s</th>
-<th>autocorr_znorm_05s</th>
-<th>jitter_rel_z</th>
-<th>jitter_rel_znorm</th>
-<th>pasa_filtro</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>vda_vda-small</td>
-<td>i5bE</td>
-<td>387</td>
-<td>4.108</td>
-<td>0.75</td>
-<td>0.731</td>
-<td>0.013</td>
-<td>0.013</td>
-<td>True</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4.-Trayectoria-3D">4. Trayectoria 3D<a class="anchor-link" href="#4.-Trayectoria-3D">¶</a></h2><p>Ejes con la unidad del ancho del cuadro. z = z_norm sin reescalar. La flor es un cilindro con el radio de la mitad del ancho de su región (supuesto).</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=11">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">AR</span> <span class="o">=</span> <span class="mi">1080</span> <span class="o">/</span> <span class="mi">1920</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">figure</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-    <span class="n">D</span><span class="p">,</span> <span class="n">inf</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">s</span><span class="p">],</span> <span class="n">INFO</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="n">figura_3d</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">TAG</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">inf</span><span class="p">[</span><span class="s2">"ref"</span><span class="p">],</span> <span class="n">inf</span><span class="p">[</span><span class="s2">"ref_name"</span><span class="p">],</span> <span class="n">AR</span><span class="p">,</span> <span class="n">OUT</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"trayectoria3d_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">))</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">strip</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-    <span class="n">D</span><span class="p">,</span> <span class="n">inf</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">s</span><span class="p">],</span> <span class="n">INFO</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="n">tira_puntos</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">CTX</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">"cap"</span><span class="p">],</span> <span class="n">inf</span><span class="p">[</span><span class="s2">"ref"</span><span class="p">],</span> <span class="n">inf</span><span class="p">[</span><span class="s2">"W"</span><span class="p">],</span> <span class="n">inf</span><span class="p">[</span><span class="s2">"H"</span><span class="p">],</span> <span class="n">OUT</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"tira_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.jpg"</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">POINT_SETS</span><span class="p">:</span>
-        <span class="n">figure</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span> <span class="n">strip</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-    <span class="n">CTX</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">"cap"</span><span class="p">]</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Ignoring fixed x limits to fulfill fixed data aspect with adjustable data limits.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Ignoring fixed x limits to fulfill fixed data aspect with adjustable data limits.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Ignoring fixed x limits to fulfill fixed data aspect with adjustable data limits.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Ignoring fixed x limits to fulfill fixed data aspect with adjustable data limits.
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>[figura omitida: contiene cuadros de video o imágenes de dataset, que no se redistribuyen; se ve al ejecutar el notebook]
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-Comparaci%C3%B3n-con-S8">5. Comparación con S8<a class="anchor-link" href="#5.-Comparaci%C3%B3n-con-S8">¶</a></h2><p>Las salidas de cada backend en S8 están en <code>resultados/S8_exploracion_3d/salidas/&lt;backend&gt;_&lt;modelo&gt;/</code>.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=13">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">REF8</span> <span class="o">=</span> <span class="n">S8</span> <span class="o">/</span> <span class="s2">"salidas"</span> <span class="o">/</span> <span class="n">TAG</span>
-<span class="k">if</span> <span class="n">REF8</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-    <span class="n">comparar</span><span class="p">(</span><span class="n">CTRL</span><span class="p">,</span> <span class="n">REF8</span> <span class="o">/</span> <span class="s2">"control_ruido.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"video"</span><span class="p">,</span> <span class="s2">"puntos"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"dif_entre_puntos"</span><span class="p">,</span> <span class="s2">"ruido_vecinos"</span><span class="p">,</span> <span class="s2">"rango_z"</span><span class="p">],</span> <span class="n">nombre</span><span class="o">=</span><span class="sa">f</span><span class="s2">"control de ruido </span><span class="si">{</span><span class="n">TAG</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="n">comparar</span><span class="p">(</span><span class="n">FIL</span><span class="p">,</span> <span class="n">REF8</span> <span class="o">/</span> <span class="s2">"filtro.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"video"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"variacion_fondo_pct"</span><span class="p">,</span> <span class="s2">"autocorr_z_05s"</span><span class="p">],</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">nombre</span><span class="o">=</span><span class="sa">f</span><span class="s2">"filtro </span><span class="si">{</span><span class="n">TAG</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">POINT_SETS</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">REF8</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"puntos_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">.csv"</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="n">comparar</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">s</span><span class="p">],</span> <span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="s2">"punto"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"z_norm"</span><span class="p">,</span> <span class="s2">"z_norm_std"</span><span class="p">],</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">nombre</span><span class="o">=</span><span class="sa">f</span><span class="s2">"z_norm </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"sin referencia de S8 para"</span><span class="p">,</span> <span class="n">TAG</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>✓ control de ruido vda_vda-small: 2 filas, diferencia máxima 0 (tolerancia 0.01)
-✓ filtro vda_vda-small: 1 filas, diferencia máxima 0 (tolerancia 0.05)
-✓ z_norm i5bE b_salientes: 7 filas, diferencia máxima 0 (tolerancia 0.02)
-✓ z_norm i5bE delante: 7 filas, diferencia máxima 0 (tolerancia 0.02)
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="6.-Revisi%C3%B3n-a-ciegas-de-i5bE-(D-18)">6. Revisión a ciegas de i5bE (D-18)<a class="anchor-link" href="#6.-Revisi%C3%B3n-a-ciegas-de-i5bE-(D-18)">¶</a></h2><p>Yilber etiquetó 20 recortes de i5bE sin ver ningún mapa: <em>delante</em>, <em>posada delante</em>, <em>detrás</em> o <em>al lado</em> de la flor
-(<code>datos_derivados/profundidad/revision_ciega/plantilla_revision_ciega.csv</code>). Interpretación fijada <strong>antes</strong> de abrir
-la clave: «posada delante» = delante con posado = 1; «al lado» se excluye del acierto de signo. Acierto de signo:
-delante ⇔ dz &lt; 0. El p-valor binomial bilateral frente a 0,5 ignora que los frames son del mismo video y que se
-comparan 4 modelos: es una señal, no una prueba.</p>
-<p>Referencia: VDA Small 14/17 (p = 0,013), YOLO26s 8, YOLO26x 10, recorte 12.
-<strong>Cautela:</strong> los «detrás» están todos en los primeros 5 s, así que el acierto puede confundirse con el tramo del video.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=15">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">binomtest</span>
-<span class="n">RC</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"dd"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"profundidad"</span> <span class="o">/</span> <span class="s2">"revision_ciega"</span>
-<span class="n">OUT_CIEGA</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"06"</span> <span class="o">/</span> <span class="s2">"ciega"</span><span class="p">;</span> <span class="n">OUT_CIEGA</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># Portado de video-val/resultados/profundidad/siete_puntos/comparacion_backends/ciega/evaluar_ciega.py</span>
-<span class="n">PLANTILLA</span><span class="p">,</span> <span class="n">CLAVE</span> <span class="o">=</span> <span class="n">RC</span> <span class="o">/</span> <span class="s2">"plantilla_revision_ciega.csv"</span><span class="p">,</span> <span class="n">RC</span> <span class="o">/</span> <span class="s2">"clave_revision_ciega.csv"</span>
-<span class="n">BACKENDS</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"yolo26"</span><span class="p">,</span> <span class="s2">"yolo26s-depth"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"yolo26"</span><span class="p">,</span> <span class="s2">"yolo26x-depth"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"yolo26_crop"</span><span class="p">,</span> <span class="s2">"yolo26s-depth"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"vda"</span><span class="p">,</span> <span class="s2">"vda-small"</span><span class="p">)]</span>
-<span class="n">FLOR</span><span class="p">,</span> <span class="n">FONDO</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.54</span><span class="p">,</span> <span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.69</span><span class="p">,</span> <span class="mf">0.58</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.30</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.62</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">)</span>
-<span class="n">ETQ</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"delante"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"delante"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"posada delante"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"delante"</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">"detras"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"detras"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"detrás"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"detras"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"al lado"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"al lado"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
-<span class="n">COLOR</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"delante"</span><span class="p">:</span> <span class="s2">"#1f77b4"</span><span class="p">,</span> <span class="s2">"detras"</span><span class="p">:</span> <span class="s2">"#d62728"</span><span class="p">,</span> <span class="s2">"al lado"</span><span class="p">:</span> <span class="s2">"#7f7f7f"</span><span class="p">}</span>
-
-<span class="c1"># Portado de video-val/resultados/profundidad/siete_puntos/comparacion_backends/ciega/evaluar_ciega.py</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">wilson</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">1.96</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span><span class="p">;</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">n</span><span class="p">;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">);</span> <span class="n">h</span> <span class="o">=</span> <span class="n">z</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">dz_by_backend</span><span class="p">(</span><span class="n">O</span><span class="p">):</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">video_path</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">FUENTES</span><span class="o">.</span><span class="n">video_id</span> <span class="k">if</span> <span class="s2">"i5befvb5mxg"</span> <span class="ow">in</span> <span class="n">v</span><span class="p">)))</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">TRAY</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"trayectoria_*i5befvb5mxg*.csv"</span><span class="p">)))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"frame"</span><span class="p">)</span>
-    <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">path</span><span class="p">);</span> <span class="n">n</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">7</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
-    <span class="n">bg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">(</span><span class="n">read_frame</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.03</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-    <span class="n">rect</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">));</span> <span class="n">ref</span><span class="p">,</span> <span class="n">far</span> <span class="o">=</span> <span class="n">rect</span><span class="p">(</span><span class="n">FLOR</span><span class="p">),</span> <span class="n">rect</span><span class="p">(</span><span class="n">FONDO</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">kind</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">BACKENDS</span><span class="p">:</span>
-        <span class="n">tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">"</span><span class="p">;</span> <span class="n">crop</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="n">fa</span> <span class="o">=</span> <span class="n">far</span>
-        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"yolo26_crop"</span><span class="p">:</span>   <span class="c1"># el mismo recorte que el notebook</span>
-            <span class="n">ob</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">~</span><span class="n">t</span><span class="o">.</span><span class="n">es_puente</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span>
-            <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">ob</span><span class="o">.</span><span class="n">cx_px</span> <span class="o">-</span> <span class="n">ob</span><span class="o">.</span><span class="n">w_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">FLOR</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span> <span class="o">-</span> <span class="mf">.05</span> <span class="o">*</span> <span class="n">W</span><span class="p">,</span> <span class="nb">max</span><span class="p">((</span><span class="n">ob</span><span class="o">.</span><span class="n">cx_px</span> <span class="o">+</span> <span class="n">ob</span><span class="o">.</span><span class="n">w_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">FLOR</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="mf">.05</span> <span class="o">*</span> <span class="n">W</span>
-            <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">ob</span><span class="o">.</span><span class="n">cy_px</span> <span class="o">-</span> <span class="n">ob</span><span class="o">.</span><span class="n">h_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">FONDO</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">)</span> <span class="o">-</span> <span class="mf">.05</span> <span class="o">*</span> <span class="n">H</span><span class="p">,</span> <span class="nb">max</span><span class="p">((</span><span class="n">ob</span><span class="o">.</span><span class="n">cy_px</span> <span class="o">+</span> <span class="n">ob</span><span class="o">.</span><span class="n">h_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">FLOR</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">)</span> <span class="o">+</span> <span class="mf">.05</span> <span class="o">*</span> <span class="n">H</span>
-            <span class="n">crop</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x0</span><span class="p">)),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)))</span>
-            <span class="n">fa</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">far</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">crop</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
-        <span class="n">be</span> <span class="o">=</span> <span class="n">make_backend</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="s2">"i5bE"</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span> <span class="n">crop</span><span class="o">=</span><span class="n">crop</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">CACHE_VDA</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">O</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
-            <span class="n">fr</span> <span class="o">=</span> <span class="n">read_frame</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">);</span> <span class="n">b</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">]</span>
-            <span class="n">box</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">cx_px</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">w_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">cy_px</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">h_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">min</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">cx_px</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">w_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">cy_px</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">h_px</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="n">m</span> <span class="o">=</span> <span class="n">motion_mask</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="n">bg</span><span class="p">,</span> <span class="o">*</span><span class="n">box</span><span class="p">);</span> <span class="n">d</span> <span class="o">=</span> <span class="n">be</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">fr</span><span class="p">)</span>
-            <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="n">m</span><span class="p">]))</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">30</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-
-            <span class="k">def</span><span class="w"> </span><span class="nf">out</span><span class="p">(</span><span class="n">rc</span><span class="p">):</span>
-                <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">rc</span><span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">),</span> <span class="nb">bool</span><span class="p">);</span> <span class="n">a0</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x0</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">x1</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">y1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">a1</span> <span class="o">&gt;</span> <span class="n">a0</span> <span class="ow">and</span> <span class="n">b1</span> <span class="o">&gt;</span> <span class="n">b0</span><span class="p">:</span>
-                    <span class="n">k</span><span class="p">[</span><span class="n">b0</span> <span class="o">-</span> <span class="n">y0</span><span class="p">:</span><span class="n">b1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">,</span> <span class="n">a0</span> <span class="o">-</span> <span class="n">x0</span><span class="p">:</span><span class="n">a1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">][</span><span class="n">k</span><span class="p">]))</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">.2</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">]))</span>
-            <span class="n">fl</span><span class="p">,</span> <span class="n">fo</span> <span class="o">=</span> <span class="n">out</span><span class="p">(</span><span class="n">ref</span><span class="p">),</span> <span class="n">out</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span>
-            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">respuesta</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">posicion</span><span class="p">,</span> <span class="n">etiqueta</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">etq</span><span class="p">,</span> <span class="n">posado</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">posado</span><span class="p">,</span> <span class="n">z_ave</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">z_flor</span><span class="o">=</span><span class="n">fl</span><span class="p">,</span> <span class="n">z_fondo</span><span class="o">=</span><span class="n">fo</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">fl</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">fo</span> <span class="o">-</span> <span class="n">fl</span><span class="p">),</span> <span class="n">dz_sin_normalizar</span><span class="o">=</span><span class="n">z</span> <span class="o">-</span> <span class="n">fl</span><span class="p">))</span>
-    <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">metrics</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">etiqueta</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"delante"</span><span class="p">,</span> <span class="s2">"detras"</span><span class="p">])]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">d</span><span class="p">[</span><span class="s2">"ok"</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">d</span><span class="o">.</span><span class="n">etiqueta</span> <span class="o">==</span> <span class="s2">"delante"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">dz</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">))</span> <span class="o">|</span> <span class="p">((</span><span class="n">d</span><span class="o">.</span><span class="n">etiqueta</span> <span class="o">==</span> <span class="s2">"detras"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">dz</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="n">k</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">ok</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">);</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">wilson</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
-    <span class="n">dl</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">etiqueta</span> <span class="o">==</span> <span class="s2">"delante"</span><span class="p">]</span><span class="o">.</span><span class="n">dz</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">etiqueta</span> <span class="o">==</span> <span class="s2">"detras"</span><span class="p">]</span><span class="o">.</span><span class="n">dz</span>
-    <span class="n">auc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([(</span><span class="n">b</span> <span class="o">&gt;</span> <span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">dl</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">dt</span><span class="p">]))</span>
-    <span class="n">no</span><span class="p">,</span> <span class="n">si</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">posado</span> <span class="o">==</span> <span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">posado</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">aciertos</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">acierto</span><span class="o">=</span><span class="n">k</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span> <span class="n">ic95_inf</span><span class="o">=</span><span class="n">lo</span><span class="p">,</span> <span class="n">ic95_sup</span><span class="o">=</span><span class="n">hi</span><span class="p">,</span> <span class="n">p_binomial</span><span class="o">=</span><span class="n">binomtest</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">pvalue</span><span class="p">,</span> <span class="n">auc</span><span class="o">=</span><span class="n">auc</span><span class="p">,</span>
-                <span class="n">verd_delante_pred_delante</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">dl</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">verd_delante_pred_detras</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">dl</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">verd_detras_pred_delante</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">dt</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">verd_detras_pred_detras</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">dt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
-                <span class="n">aciertos_no_posados</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">no</span><span class="o">.</span><span class="n">ok</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">n_no_posados</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">no</span><span class="p">),</span> <span class="n">aciertos_posados</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">ok</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="n">n_posados</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">si</span><span class="p">),</span>
-                <span class="n">dz_med_delante_no_posado</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">no</span><span class="p">[</span><span class="n">no</span><span class="o">.</span><span class="n">etiqueta</span> <span class="o">==</span> <span class="s2">"delante"</span><span class="p">]</span><span class="o">.</span><span class="n">dz</span><span class="o">.</span><span class="n">median</span><span class="p">()),</span> <span class="n">dz_med_posado</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">dz</span><span class="o">.</span><span class="n">median</span><span class="p">()),</span> <span class="n">dz_med_detras</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">median</span><span class="p">()),</span> <span class="n">dz_med_al_lado</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">etiqueta</span> <span class="o">==</span> <span class="s2">"al lado"</span><span class="p">]</span><span class="o">.</span><span class="n">dz</span><span class="o">.</span><span class="n">median</span><span class="p">()))</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">evaluar_ciega</span><span class="p">():</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">PLANTILLA</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">"posicion"</span><span class="p">:</span> <span class="nb">str</span><span class="p">})</span>
-    <span class="k">if</span> <span class="n">T</span><span class="o">.</span><span class="n">posicion</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"FALTA: la plantilla sigue vacía:"</span><span class="p">,</span> <span class="n">PLANTILLA</span><span class="p">);</span> <span class="k">return</span>
-    <span class="n">T</span><span class="p">[[</span><span class="s2">"etq"</span><span class="p">,</span> <span class="s2">"posado"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ETQ</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">T</span><span class="o">.</span><span class="n">posicion</span><span class="p">]</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">etq</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">();</span> <span class="nb">print</span><span class="p">(</span><span class="s2">"recuento:"</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="s2">"| posados:"</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">posado</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
-    <span class="k">assert</span> <span class="n">c</span> <span class="o">==</span> <span class="p">{</span><span class="s2">"delante"</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">"detras"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"al lado"</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span> <span class="ow">and</span> <span class="n">T</span><span class="o">.</span><span class="n">posado</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"el recuento no cuadra"</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="n">dz_by_backend</span><span class="p">(</span><span class="n">T</span><span class="p">);</span> <span class="n">R</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT_CIEGA</span> <span class="o">/</span> <span class="s2">"evaluacion_ciega_por_frame.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">S</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="o">**</span><span class="n">metrics</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">R</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)]);</span> <span class="n">S</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT_CIEGA</span> <span class="o">/</span> <span class="s2">"evaluacion_ciega.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"display.width"</span><span class="p">,</span> <span class="mi">240</span><span class="p">);</span> <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">"display.max_columns"</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
-    <span class="n">K</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">CLAVE</span><span class="p">);</span> <span class="n">s</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="s2">"yolo26_yolo26s-depth"</span><span class="p">]</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">K</span><span class="p">[[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"dz"</span><span class="p">]]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"dz"</span><span class="p">:</span> <span class="s2">"dz_clave"</span><span class="p">}),</span> <span class="n">on</span><span class="o">=</span><span class="s2">"id"</span><span class="p">)</span>
-    <span class="n">s</span><span class="p">[</span><span class="s2">"dz_sin_normalizar_vs_clave"</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">dz_sin_normalizar</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">dz_clave</span><span class="p">;</span> <span class="n">s</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT_CIEGA</span> <span class="o">/</span> <span class="s2">"control_clave.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"control clave (yolo26s): dif. absoluta mediana"</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dz_sin_normalizar_vs_clave</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">median</span><span class="p">()),</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">"| máx."</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dz_sin_normalizar_vs_clave</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">"| mismo signo:"</span><span class="p">,</span> <span class="nb">int</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dz_sin_normalizar</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dz_clave</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="s2">"de"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
-    <span class="n">P</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"frame"</span><span class="p">,</span> <span class="s2">"respuesta"</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="s2">"backend"</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">"dz"</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span> <span class="n">P</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT_CIEGA</span> <span class="o">/</span> <span class="s2">"dz_por_frame.csv"</span><span class="p">);</span> <span class="nb">print</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">BACKENDS</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">5.4</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">BACKENDS</span><span class="p">),</span> <span class="mi">6</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">R</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
-        <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"dz"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span> <span class="n">m</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">S</span><span class="o">.</span><span class="n">backend</span> <span class="o">==</span> <span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">a</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="n">a</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">dz</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">COLOR</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">etiqueta</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"s"</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">posado</span> <span class="k">else</span> <span class="s2">"o"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-            <span class="n">a</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s2">"#</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">dz</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">),</span> <span class="n">textcoords</span><span class="o">=</span><span class="s2">"offset points"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-        <span class="n">a</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="se">\n</span><span class="s2">signo </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">aciertos</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">n</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">ic95_inf</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">ic95_sup</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">) | p </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">p_binomial</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> | AUC </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">auc</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span> <span class="n">a</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([]);</span> <span class="n">a</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">);</span> <span class="n">a</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"dz (negativo = delante según el modelo)"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">lab</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">COLOR</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">c</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">c</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"s"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"posada"</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"lower right"</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"i5bE: dz de cada frame con la etiqueta a ciegas de Yilber. Bien separado = azules a la izquierda de 0 y rojos a la derecha"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span> <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">OUT_CIEGA</span> <span class="o">/</span> <span class="s2">"evaluacion_ciega.jpg"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">S</span>
-
-<span class="n">S_CIEGA</span> <span class="o">=</span> <span class="n">evaluar_ciega</span><span class="p">()</span>
-<span class="n">comparar</span><span class="p">(</span><span class="n">S_CIEGA</span><span class="p">,</span> <span class="n">S8</span> <span class="o">/</span> <span class="s2">"ciega"</span> <span class="o">/</span> <span class="s2">"evaluacion_ciega.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"backend"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"aciertos"</span><span class="p">,</span> <span class="s2">"n"</span><span class="p">,</span> <span class="s2">"auc"</span><span class="p">],</span> <span class="n">nombre</span><span class="o">=</span><span class="s2">"revisión a ciegas frente a S8"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>recuento: {'delante': 12, 'detras': 5, 'al lado': 3} | posados: 6
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>                                              0                     1                          2              3
-backend                    yolo26_yolo26s-depth  yolo26_yolo26x-depth  yolo26_crop_yolo26s-depth  vda_vda-small
-aciertos                                      8                    10                         12             14
-n                                            17                    17                         17             17
-acierto                                   0.471                 0.588                      0.706          0.824
-ic95_inf                                  0.262                  0.36                      0.469           0.59
-ic95_sup                                   0.69                 0.784                      0.867          0.938
-p_binomial                                  1.0                 0.629                      0.143          0.013
-auc                                         0.9                   1.0                      0.983            1.0
-verd_delante_pred_delante                     3                     5                          7              9
-verd_delante_pred_detras                      9                     7                          5              3
-verd_detras_pred_delante                      0                     0                          0              0
-verd_detras_pred_detras                       5                     5                          5              5
-aciertos_no_posados                           5                     6                          7              8
-n_no_posados                                 11                    11                         11             11
-aciertos_posados                              3                     4                          5              6
-n_posados                                     6                     6                          6              6
-dz_med_delante_no_posado                   0.01                 0.013                      0.008         -0.007
-dz_med_posado                               0.0                -0.009                     -0.021         -0.067
-dz_med_detras                             0.062                 0.063                      0.068          0.459
-dz_med_al_lado                            0.028                 0.027                      0.032          0.198
-control clave (yolo26s): dif. absoluta mediana 0.0 | máx. 0.0 | mismo signo: 20 de 20
- id  frame      respuesta  vda_vda-small  yolo26_crop_yolo26s-depth  yolo26_yolo26s-depth  yolo26_yolo26x-depth
-  1    453        delante          0.016                      0.032                 0.097                 0.018
-  2    301 posada delante         -0.025                     -0.015                 0.003                 0.005
-  3    224        al lado          0.131                      0.000                -0.006                 0.027
-  4     52         detras          0.495                      0.116                 0.079                 0.063
-  5    129         detras          0.459                      0.109                 0.068                 0.113
-  6    337 posada delante         -0.075                     -0.041                -0.010                -0.012
-  7    372        delante         -0.030                      0.007                 0.012                 0.012
-  8    491        delante          0.122                      0.008                 0.038                 0.014
-  9    408        delante         -0.099                     -0.007                 0.007                -0.002
- 10    319 posada delante         -0.096                     -0.027                 0.004                -0.007
- 11    354 posada delante         -0.059                     -0.034                -0.003                -0.011
- 12    170        al lado          0.279                      0.041                 0.028                 0.021
- 13    473        delante          0.066                      0.009                 0.004                 0.007
- 14    147         detras          0.461                      0.068                 0.062                 0.094
- 15     93         detras          0.153                      0.025                 0.023                 0.023
- 16    111         detras          0.383                      0.053                 0.061                 0.059
- 17    188        al lado          0.198                      0.032                 0.032                 0.070
- 18    283 posada delante         -0.019                      0.005                 0.015                 0.002
- 19    265        delante         -0.160                     -0.025                 0.002                 0.014
- 20    390 posada delante         -0.135                     -0.003                -0.026                -0.032
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>✓ revisión a ciegas frente a S8: 4 filas, diferencia máxima 0 (tolerancia 0.01)
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>True</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Conclusiones-(S8)">Conclusiones (S8)<a class="anchor-link" href="#Conclusiones-(S8)">¶</a></h2><ul>
-<li><strong>D-13:</strong> YOLO26-Depth cuadro a cuadro no sirve como coordenada 3D continua: solo 1 de 8 videos pasa el filtro.</li>
-<li><strong>D-14:</strong> la profundidad se lee solo en los 7 puntos y relativa a la flor y al fondo del mismo mapa. En i5bE la
-diferencia entre puntos (~0,10) supera al ruido (~0,02).</li>
-<li><strong>D-18:</strong> en la revisión a ciegas, VDA Small acierta 14 de 17 signos (p = 0,013) frente a 8-12 de los YOLO.
-<strong>Decisión: otra prueba (SP-02.9)</strong> con VDA Small en otro video de cámara fija y con los frames ciegos repartidos
-por todo el video. La 2D sigue siendo la base del logo.</li>
-<li><strong>Incremento:</strong> pipeline de profundidad con backend intercambiable, revisión a ciegas reproducible y la variante
-<code>delante</code> de i5bE como propuesta visual.</li>
-</ul>
+<h2 id="Conclusi%C3%B3n-(S8)">Conclusión (S8)<a class="anchor-link" href="#Conclusi%C3%B3n-(S8)">¶</a></h2><p>Los mapas de VDA Small tienen consistencia temporal (el modelo procesa el video completo), cosa que YOLO26-Depth
+cuadro a cuadro no da (D-13). Se usan <strong>solo</strong> para leer la profundidad relativa en los 7 puntos (notebook 06).</p>
 </div>
 </div>
 </div>

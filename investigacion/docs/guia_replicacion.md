@@ -1,7 +1,6 @@
 # Guía para quien clona el repositorio
 
-**¿Quieres trayectorias de tus propios videos?** No necesitas esta guía: usa `notebooks/herramienta_trayectorias.ipynb` (ver README).
-**¿Quieres entrenar con tu dataset?** Notebook 01, sección 2, y notebook 02, sección 6.
+**¿Quieres trayectorias de tus propios videos o entrenar con tus datos?** No necesitas esta guía: sigue el README de la raíz.
 
 Esta guía es para la **línea de investigación**: tres recorridos, de menos a más esfuerzo, para comprobar lo que hicimos.
 
@@ -23,9 +22,9 @@ Esta guía es para la **línea de investigación**: tres recorridos, de menos a 
 Las trayectorias dependen del detector vigente (`modelos/yolo26n_ft_v2/best.pt`, en el repo) y de las trayectorias
 detalladas congeladas en `datos_derivados/tracks/`. No hace falta Roboflow, ni los videos de Adobe, ni entrenar.
 
-1. **Clona** dentro de una carpeta de trabajo, por ejemplo `D:\video_eval\colibri-logo`. La carpeta padre es la
-   *zona de trabajo* (`zona_trabajo: ..` en `config.yaml`); ahí se crean `datos\`, `runs\` y `modelos\`.
-2. **Entorno `yolo`**: `entornos/instalar.md`, sección 2 (venv, `requirements-yolo.txt`, kernel `colibri-yolo`).
+1. **Clona** el repositorio. La *zona de trabajo* es `investigacion/trabajo/` (`zona_trabajo` en `investigacion/config.yaml`);
+   ahí se crean `datos\`, `runs\` y `modelos\`.
+2. **Entorno `yolo`**: README de la raíz (venv, `requirements.txt`, kernel `colibri`).
 3. **Los videos de YouTube**: en el notebook 01, sección 1, pon `DESCARGAR_YOUTUBE = True` y ejecuta **solo esa
    sección**. Descarga con `yt-dlp` los 8 videos de YouTube (los 4 `test_` son los imprescindibles) de `datos_derivados/fuentes.csv` en la resolución de la
    columna `nota` y los deja en `datos/fuentes/videos/`. La tabla final te dice si `fps` y `frames` coinciden.
@@ -39,8 +38,8 @@ valen para esa copia y su comparación saldrá ✗. Las demás no se ven afectad
 
 ## C. Rehacer todo desde cero
 
-1. Pasos 1 y 2 de B, y además el **entorno `vda`** (`instalar.md`, sección 3: repo de Video Depth Anything en el
-   commit fijado y el checkpoint Small).
+1. Pasos 1 y 2 de B, y además Video Depth Anything (`entornos/instalar.md`, sección 3: su repo en el commit fijado y
+   el checkpoint Small).
 2. **`.env`**: copia `.env.example` y pon tu `ROBOFLOW_API_KEY` (cuenta gratuita de Roboflow). ds1 y ds2 son públicos.
 3. **Los 12 videos** (`datos_derivados/fuentes.csv`):
    - 8 de YouTube: como en B.3;
@@ -51,8 +50,7 @@ valen para esa copia y su comparación saldrá ✗. Las demás no se ven afectad
    regenera los frames de humming a partir de los videos y las etiquetas del repo.
 5. **`02_detector` con `COLIBRI_MODO=recalcular`**: reentrena S2 (~5 h) y el ajuste fino de S4 (~7 h en una GPU de
    6 GB) y pasa el gate. Los pesos nuevos quedan en `runs/02/<modelo>/weights/best.pt`.
-6. **`03` a `06` con `COLIBRI_MODO=recalcular`**: tracking con tu detector, unión, 7 puntos, mapas de VDA (05, kernel
-   `vda`) y profundidad en los 7 puntos.
+6. **`03` a `06` con `COLIBRI_MODO=recalcular`**: tracking con tu detector, unión, 7 puntos, mapas de VDA (05) y profundidad en los 7 puntos.
 
 **Qué esperar:** los frames regenerados no son los mismos JPEG que los originales, así que las métricas por video de
 02 pueden moverse hasta 0,10 (las globales se mantienen). Un detector reentrenado tampoco da cajas idénticas, así que

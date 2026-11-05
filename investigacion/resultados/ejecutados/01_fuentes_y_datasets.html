@@ -7803,10 +7803,10 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="01-%C2%B7-Fuentes-y-datasets-(S1,-S4)">01 · Fuentes y datasets (S1, S4)<a class="anchor-link" href="#01-%C2%B7-Fuentes-y-datasets-(S1,-S4)">¶</a></h1><p><strong>Historias:</strong> US-01.1 (fuentes y licencias), US-01.4 (auditoría), US-01.5 (particiones), US-01.6 (prueba virgen).
-<strong>Kernel:</strong> <code>colibri-yolo</code>.</p>
-<p>Este notebook deja la zona de trabajo (<code>D:\video_eval\datos</code>) lista para entrenar y evaluar, <strong>partiendo solo del repo</strong>.
+<strong>Kernel:</strong> <code>colibri</code>.</p>
+<p>Este notebook deja la zona de trabajo (carpeta <code>datos/</code> de la zona de trabajo) lista para entrenar y evaluar, <strong>partiendo solo del repo</strong>.
 Lee los datasets de <code>config.yaml</code> → <code>datasets</code>, así que puedes usar <strong>los tuyos</strong> (sección 2).
-Para trayectorias con tus videos no hace falta: usa <code>herramienta_trayectorias</code>.</p>
+Para entrenar con datos propios es más directo el notebook <code>notebooks/entrenar_detector.ipynb</code> de la raíz del repositorio.</p>
 <table>
 <thead>
 <tr>
@@ -7884,14 +7884,8 @@ Los frames se decodifican <strong>en orden</strong> (<code>grab</code> secuencia
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
+<pre>repo D:\video_eval\colibri-logo\investigacion | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
+00_comun listo: 12 videos en fuentes.csv | detector vigente ..\modelos\yolo26n_ft_v2\best.pt existe
 </pre>
 </div>
 </div>
@@ -7942,8 +7936,8 @@ cuadros. Si <code>frames</code> no coincide, las etiquetas de ese video <strong>
             <span class="k">continue</span>
         <span class="n">dst</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">alto</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">nota</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"p"</span><span class="p">))</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"yt_dlp"</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"bv*[height=</span><span class="si">{</span><span class="n">alto</span><span class="si">}</span><span class="s2">][ext=mp4]+ba[ext=m4a]/b[height=</span><span class="si">{</span><span class="n">alto</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span>
-                        <span class="s2">"--merge-output-format"</span><span class="p">,</span> <span class="s2">"mp4"</span><span class="p">,</span> <span class="s2">"-o"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"yt_dlp"</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"bv*[height=</span><span class="si">{</span><span class="n">alto</span><span class="si">}</span><span class="s2">][ext=mp4]/b[height=</span><span class="si">{</span><span class="n">alto</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span>   <span class="c1"># solo video: no hace falta audio ni ffmpeg</span>
+                        <span class="s2">"-o"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">dst</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">FUENTES</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
@@ -7959,7 +7953,7 @@ cuadros. Si <code>frames</code> no coincide, las etiquetas de ese video <strong>
 <span class="n">VER</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">);</span> <span class="n">VER</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"fuentes_verificadas.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">VER</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">"sha256"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"ignore"</span><span class="p">))</span>
 <span class="n">faltan</span> <span class="o">=</span> <span class="n">VER</span><span class="p">[</span><span class="o">~</span><span class="n">VER</span><span class="o">.</span><span class="n">existe</span><span class="p">]</span><span class="o">.</span><span class="n">corto</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"faltan:"</span><span class="p">,</span> <span class="n">faltan</span> <span class="ow">or</span> <span class="s2">"ninguno"</span><span class="p">,</span> <span class="s2">"| frames distintos:"</span><span class="p">,</span> <span class="n">VER</span><span class="p">[</span><span class="n">VER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"frames_ok"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span><span class="o">.</span><span class="n">corto</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"faltan:"</span><span class="p">,</span> <span class="n">faltan</span> <span class="ow">or</span> <span class="s2">"ninguno"</span><span class="p">,</span> <span class="s2">"| frames distintos:"</span><span class="p">,</span> <span class="n">VER</span><span class="p">[</span><span class="n">VER</span><span class="o">.</span><span class="n">frames_ok</span> <span class="o">==</span> <span class="kc">False</span><span class="p">]</span><span class="o">.</span><span class="n">corto</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="s2">"frames_ok"</span> <span class="ow">in</span> <span class="n">VER</span> <span class="k">else</span> <span class="p">[])</span>
 </pre></div>
 </div>
 </div>
@@ -8365,7 +8359,7 @@ están en <code>.env.example</code>. Desde aquí, las secciones 2 a 4 son las de
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Portado de notebook original colibri_yolo26_tracking.ipynb, celda 7</span>
 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">RAW_DIRS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"########## </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">DATASETS</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">'project'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"########## </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">DATASETS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'project'</span><span class="p">,</span><span class="w"> </span><span class="n">root</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">readme</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"README*.txt"</span><span class="p">)):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"===== </span><span class="si">{</span><span class="n">readme</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> ====="</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">readme</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">))</span>
@@ -9912,7 +9906,7 @@ imagen; el SHA1 del manifiesto completo identifica el dataset y se compara con e
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[13]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>1744</pre>
+<pre>1890</pre>
 </div>
 </div>
 </div>
@@ -10002,13 +9996,7 @@ vv a entrenamiento. Sustituye a <code>build_video_test</code>, que necesitaba lo
 <pre>vv01_adobe1294608945 96 de 96 frames
 vv02_adobe512464022 95 de 95 frames
 vv03_florisuga_file 52 de 52 frames
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>prueba vv: 243 frames, 174 cajas (esperado 243 frames y 174 cajas menos las de los ignorados)
+prueba vv: 243 frames, 174 cajas (esperado 243 frames y 174 cajas menos las de los ignorados)
 </pre>
 </div>
 </div>
@@ -10116,7 +10104,7 @@ listas v2: train_ft 5178 ds2+ds1 + 299 humming x3; val_ft 1436 + 79; test_video 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="6.1-%C2%BFLos-frames-regenerados-son-los-mismos?">6.1 ¿Los frames regenerados son los mismos?<a class="anchor-link" href="#6.1-%C2%BFLos-frames-regenerados-son-los-mismos?">¶</a></h3><p>Si en este equipo siguen las imágenes originales de S4 (<code>D:\video_eval\reentreno\v2\humming</code>), se compara una
+<h3 id="6.1-%C2%BFLos-frames-regenerados-son-los-mismos?">6.1 ¿Los frames regenerados son los mismos?<a class="anchor-link" href="#6.1-%C2%BFLos-frames-regenerados-son-los-mismos?">¶</a></h3><p>Si en este equipo siguen las imágenes originales de S4 (las de la zona de trabajo), se compara una
 muestra: diferencia media por píxel (0-255) y distancia dHash. Esperado: diferencia pequeña (recompresión JPEG) y
 dHash ≤ 2. Un dHash alto indica que el índice de frame no cae en el mismo cuadro, y entonces las etiquetas de ese
 video no valen para esa copia.</p>

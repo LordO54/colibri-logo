@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>05_profundidad_vda</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>03_tracking_y_union</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7802,18 +7802,53 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="05-%C2%B7-Mapas-de-profundidad-con-Video-Depth-Anything-Small-(S8)">05 · Mapas de profundidad con Video Depth Anything Small (S8)<a class="anchor-link" href="#05-%C2%B7-Mapas-de-profundidad-con-Video-Depth-Anything-Small-(S8)">¶</a></h1><p><strong>Historia:</strong> SP-02.7 (spike de profundidad monocular). <strong>Kernel:</strong> <code>colibri-vda</code> (otro torch y el repo de VDA; ver
-<code>entornos/instalar.md</code>). Es el único notebook que usa ese entorno.</p>
-<p>Procesa el video completo dos veces (original y volteado horizontalmente) y guarda los mapas en float16 en
-<code>runs/profundidad/cache_vda/&lt;corto&gt;_{orig,flip}.npz</code> (función <code>mapas_vda</code> de <code>00_comun</code>, que también usa la herramienta), ya alineados con el frame original. El notebook 06 los lee con
-el backend <code>vda</code> de <code>00_comun</code>.</p>
-<ul>
-<li><strong>Licencia (D-17):</strong> solo el modelo Small (Apache-2.0). Base y Large son CC-BY-NC y no se usan.</li>
-<li><strong>Salida:</strong> disparidad relativa, mayor = más cerca (al revés que YOLO26-Depth).</li>
-<li><strong>Resolución:</strong> la de <code>config.yaml</code> → <code>vda.sizes</code>, de mayor a menor hasta que cabe en la GPU; la usada queda en <code>info.json</code>.
-S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_norm</code>:</strong> en i5bE, hasta 0,46 entre 448 y 392.</li>
-</ul>
-<p>En modo <code>artefactos</code> no recalcula los mapas que ya existan: los <code>.npz</code> pesan cientos de MB y no van en git.</p>
+<h1 id="03-%C2%B7-Tracking-y-uni%C3%B3n-de-fragmentos-(S3-%E2%86%92-S5)">03 · Tracking y unión de fragmentos (S3 → S5)<a class="anchor-link" href="#03-%C2%B7-Tracking-y-uni%C3%B3n-de-fragmentos-(S3-%E2%86%92-S5)">¶</a></h1><p><strong>Historias:</strong> US-02.4 (tracker), US-02.5 (trayectoria por visita), US-01.6 (prueba virgen). <strong>Kernel:</strong> <code>colibri</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Sección</th>
+<th>Qué reproduce</th>
+<th>Decisión</th>
+<th>Cifra de referencia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Videos <code>test_</code> y GT v1 / v2</td>
+<td>D-07</td>
+<td>216 frames GT en 4 videos</td>
+</tr>
+<tr>
+<td>2</td>
+<td>5 configuraciones de tracker en <code>test_</code></td>
+<td><strong>D-09</strong> ByteTrack combo</td>
+<td><code>resultados/S5_tracking_union_test/gt*/metricas_tracking_test.csv</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Rejilla de unión en vv + 4 <code>train_</code></td>
+<td>(elegida 0,5 s × 4, luego descartada)</td>
+<td><code>union_rejilla.csv</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Actual / elegida / prudente en <code>test_</code> con GT v1 y v2</td>
+<td><strong>D-10</strong> prudente 1 s × 2,5</td>
+<td><code>union_test_gt1_gt2.csv</code>: IDF1 visita 0,667, 0 puentes falsos</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Trayectorias finales de <code>test_</code></td>
+<td>entrada de 04 y 06</td>
+<td><code>trayectorias_prudente/*.csv</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Modo <code>artefactos</code></strong> (por defecto): usa las trayectorias detalladas congeladas de S5 (<code>datos_derivados/tracks/</code>),
+recalcula todas las métricas y las compara. Tarda unos minutos (solo lee videos para los cortes de escena y las figuras).
+<strong>Modo <code>recalcular</code></strong>: vuelve a correr el tracking de las 5 configuraciones en GPU (≈ 20 pasadas de video).</p>
+<p>Las salidas nuevas van a <code>runs/03/</code>; las de referencia en <code>resultados/</code> no se tocan.</p>
 </div>
 </div>
 </div>
@@ -7826,11 +7861,8 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">run</span> 00_comun.ipynb
-<span class="n">VIDEO_LIST</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"i5bE"</span><span class="p">]</span>          <span class="c1"># cortos de datos_derivados/fuentes.csv; SP-02.9 añadirá otro video de cámara fija</span>
-<span class="n">CACHE</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"profundidad"</span> <span class="o">/</span> <span class="s2">"cache_vda"</span><span class="p">;</span> <span class="n">CACHE</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">VIDEOS</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">video_path</span><span class="p">(</span><span class="n">FUENTES</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"corto"</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">video_id</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">VIDEO_LIST</span><span class="p">}</span>
-<span class="n">SIZES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VDA_SIZES"</span><span class="p">,</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">CFG</span><span class="p">[</span><span class="s2">"vda"</span><span class="p">][</span><span class="s2">"sizes"</span><span class="p">])))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">VIDEOS</span><span class="p">,</span> <span class="s2">"| sizes"</span><span class="p">,</span> <span class="n">SIZES</span><span class="p">)</span>
+<span class="n">OUT</span> <span class="o">=</span> <span class="n">RUNS</span> <span class="o">/</span> <span class="s2">"03"</span><span class="p">;</span> <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">REF</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="s2">"resultados"</span><span class="p">]</span> <span class="o">/</span> <span class="s2">"S5_tracking_union_test"</span>
 </pre></div>
 </div>
 </div>
@@ -7843,21 +7875,27 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>repo D:\video_eval\colibri-logo | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>00_comun listo: 12 videos en fuentes.csv | detector vigente modelos\yolo26n_ft_v2\best.pt existe
-{'i5bE': 'D:\\video_eval\\datos\\fuentes\\videos\\test\\test_YTDown.com_YouTube_Media_i5bEfvb5mxg_Ruby-Throated-Hummingbird-At-A-Flower-Part-2_001_1080p.mp4'} | sizes (392, 336, 280)
+<pre>repo D:\video_eval\colibri-logo\investigacion | zona de trabajo D:\video_eval | MODO = artefactos | .env: ROBOFLOW_API_KEY, LICENSE_DS1, LICENSE_DS2
+00_comun listo: 12 videos en fuentes.csv | detector vigente ..\modelos\yolo26n_ft_v2\best.pt existe
 </pre>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="1.-Videos-de-prueba-y-verdad-de-terreno">1. Videos de prueba y verdad de terreno<a class="anchor-link" href="#1.-Videos-de-prueba-y-verdad-de-terreno">¶</a></h2><p>Los cuatro <code>test_</code> nunca han entrado en entrenamiento ni en validación (D-07). GT v1 = etiquetas de la versión 1 de
+<code>humming</code>; GT v2 = la versión corregida tras revisar los errores de S5 (<code>datos_derivados/humming/cambios_v1_v2.csv</code>).
+Un frame con 2+ cajas no forma ni separa visitas.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7865,13 +7903,12 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 <div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">pendientes</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">VIDEOS</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"orig"</span><span class="p">,</span> <span class="s2">"flip"</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">.npz"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
-<span class="k">if</span> <span class="n">pendientes</span> <span class="ow">or</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"recalcular"</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">MODO</span> <span class="o">==</span> <span class="s2">"recalcular"</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"modo recalcular: borra a mano los .npz que quieras rehacer; los existentes no se sobrescriben"</span><span class="p">)</span>
-    <span class="n">mapas_vda</span><span class="p">(</span><span class="n">VIDEOS</span><span class="p">,</span> <span class="n">CACHE</span><span class="p">,</span> <span class="n">SIZES</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"mapas ya calculados:"</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">CACHE</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.npz"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">VIDS_TEST</span> <span class="o">=</span> <span class="n">videos</span><span class="p">((</span><span class="s2">"test"</span><span class="p">,))</span>
+<span class="n">GT</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">cargar_gt_test</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">VIDS_TEST</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"v1"</span><span class="p">,</span> <span class="s2">"v2"</span><span class="p">)}</span>
+<span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">GT</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"GT </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames | </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">n_gt</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="si">}</span><span class="s2"> cajas | máx. aves por frame </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">n_gt</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">({</span><span class="n">v</span><span class="p">:</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"video_id"</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">frames</span><span class="o">=</span><span class="p">(</span><span class="s2">"frame"</span><span class="p">,</span> <span class="s2">"size"</span><span class="p">),</span> <span class="n">cajas</span><span class="o">=</span><span class="p">(</span><span class="s2">"n_gt"</span><span class="p">,</span> <span class="s2">"sum"</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">GT</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">corto</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -7884,9 +7921,100 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>mapas ya calculados: ['i5bE_flip.npz', 'i5bE_orig.npz']
+<pre>GT v1: 216 frames | 140 cajas | máx. aves por frame 1
+GT v2: 216 frames | 177 cajas | máx. aves por frame 1
 </pre>
 </div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr>
+<th></th>
+<th colspan="2" halign="left">v1</th>
+<th colspan="2" halign="left">v2</th>
+</tr>
+<tr>
+<th></th>
+<th>frames</th>
+<th>cajas</th>
+<th>frames</th>
+<th>cajas</th>
+</tr>
+<tr>
+<th>video_id</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>DoJ1</th>
+<td>20</td>
+<td>18</td>
+<td>20</td>
+<td>20</td>
+</tr>
+<tr>
+<th>Gu30</th>
+<td>27</td>
+<td>26</td>
+<td>27</td>
+<td>26</td>
+</tr>
+<tr>
+<th>i5bE</th>
+<td>61</td>
+<td>32</td>
+<td>61</td>
+<td>50</td>
+</tr>
+<tr>
+<th>J4PK</th>
+<td>108</td>
+<td>64</td>
+<td>108</td>
+<td>81</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-Cinco-configuraciones-de-tracker-(S5,-D-09)">2. Cinco configuraciones de tracker (S5, D-09)<a class="anchor-link" href="#2.-Cinco-configuraciones-de-tracker-(S5,-D-09)">¶</a></h2><p>Mismas funciones que S3 (<code>evaluate_tracks</code>, <code>build_trajectory</code>), solo cambia la GT. Criterio fijado <strong>antes</strong> de ver
+resultados: mínimo <code>ids_por_ave + IDSW</code>, luego mayor IDF1, luego mayor MOTA; ByteTrack si empatan.
+La configuración <code>e_viejo_oc_combo</code> (modelo anterior) solo es referencia.</p>
 </div>
 </div>
 </div>
@@ -7898,12 +8026,53 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="s2">"info.json"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="p">{}</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">VIDEOS</span><span class="p">:</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">CACHE</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">_orig.npz"</span><span class="p">)[</span><span class="s2">"maps"</span><span class="p">]</span>
-    <span class="n">n_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">FUENTES</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">"corto"</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">"| frames esperados"</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">,</span> <span class="s2">"✓"</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_frames</span> <span class="k">else</span> <span class="s2">"✗"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">metricas_tracking</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="n">vids</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Cuerpo de main() de tracking_test.py: métricas por video y GLOBAL para cada configuración."""</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">short_all</span><span class="p">,</span> <span class="n">TR</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">cfg_name</span><span class="p">,</span> <span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">over</span><span class="p">)</span> <span class="ow">in</span> <span class="n">CONFIGS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">per_vid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">vids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">tr</span> <span class="o">=</span> <span class="n">get_tracks</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">cfg_name</span><span class="p">);</span> <span class="n">TR</span><span class="p">[(</span><span class="n">cfg_name</span><span class="p">,</span> <span class="n">vid</span><span class="p">)]</span> <span class="o">=</span> <span class="n">tr</span>
+            <span class="n">m</span><span class="p">,</span> <span class="n">per</span> <span class="o">=</span> <span class="n">evaluate_tracks</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">tr</span><span class="p">)</span>
+            <span class="n">traj</span><span class="p">,</span> <span class="n">tinfo</span> <span class="o">=</span> <span class="n">build_trajectory</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="n">short_tracks</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">GT</span><span class="p">[</span><span class="n">GT</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="n">vid</span><span class="p">])</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"config"</span><span class="p">:</span> <span class="n">cfg_name</span><span class="p">,</span> <span class="s2">"segmentos"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">segmento</span><span class="o">.</span><span class="n">nunique</span><span class="p">())</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="s2">"frames_traj"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">traj</span><span class="p">),</span> <span class="s2">"tracks_cortos"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">st</span><span class="p">)})</span>
+            <span class="n">per_vid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">);</span> <span class="n">short_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg_name</span><span class="p">,</span> <span class="n">video_id</span><span class="o">=</span><span class="n">vid</span><span class="p">))</span>
+        <span class="n">pv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">per_vid</span><span class="p">)</span>
+        <span class="n">n_gt</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">fp</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">n_gt</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">pv</span><span class="o">.</span><span class="n">TP</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">pv</span><span class="o">.</span><span class="n">FP</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">rows</span> <span class="o">+=</span> <span class="n">per_vid</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"config"</span><span class="p">:</span> <span class="n">cfg_name</span><span class="p">,</span> <span class="s2">"video_id"</span><span class="p">:</span> <span class="s2">"GLOBAL"</span><span class="p">,</span> <span class="s2">"tracker"</span><span class="p">:</span> <span class="n">tracker</span><span class="p">,</span> <span class="s2">"n_gt"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_gt</span><span class="p">),</span> <span class="s2">"TP"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">tp</span><span class="p">),</span>
+                     <span class="s2">"FN"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_gt</span> <span class="o">-</span> <span class="n">tp</span><span class="p">),</span> <span class="s2">"FP"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">fp</span><span class="p">),</span> <span class="s2">"IDSW"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">IDSW</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+                     <span class="s2">"ids_por_ave"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">ids_por_ave</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="s2">"ids_totales"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">ids_totales</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+                     <span class="s2">"recall"</span><span class="p">:</span> <span class="n">tp</span> <span class="o">/</span> <span class="n">n_gt</span><span class="p">,</span> <span class="s2">"precision"</span><span class="p">:</span> <span class="n">tp</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                     <span class="s2">"MOTA"</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">n_gt</span> <span class="o">-</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">pv</span><span class="o">.</span><span class="n">IDSW</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">/</span> <span class="n">n_gt</span><span class="p">,</span> <span class="s2">"IDF1"</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pv</span><span class="o">.</span><span class="n">idtp</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_gt</span> <span class="o">+</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">),</span>
+                     <span class="s2">"IoU_medio"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">IoU_medio</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">pv</span><span class="o">.</span><span class="n">TP</span><span class="p">))</span> <span class="k">if</span> <span class="n">tp</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                     <span class="s2">"segmentos"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">segmentos</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="s2">"frames_traj"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">frames_traj</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+                     <span class="s2">"tracks_cortos"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">tracks_cortos</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="s2">"idtp"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">idtp</span><span class="o">.</span><span class="n">sum</span><span class="p">())})</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"config"</span><span class="p">,</span> <span class="s2">"video_id"</span><span class="p">,</span> <span class="s2">"tracker"</span><span class="p">,</span> <span class="s2">"n_gt"</span><span class="p">,</span> <span class="s2">"TP"</span><span class="p">,</span> <span class="s2">"FN"</span><span class="p">,</span> <span class="s2">"FP"</span><span class="p">,</span> <span class="s2">"IDSW"</span><span class="p">,</span> <span class="s2">"ids_por_ave"</span><span class="p">,</span> <span class="s2">"ids_totales"</span><span class="p">,</span>
+            <span class="s2">"tracks_cortos"</span><span class="p">,</span> <span class="s2">"recall"</span><span class="p">,</span> <span class="s2">"precision"</span><span class="p">,</span> <span class="s2">"MOTA"</span><span class="p">,</span> <span class="s2">"IDF1"</span><span class="p">,</span> <span class="s2">"IoU_medio"</span><span class="p">,</span> <span class="s2">"segmentos"</span><span class="p">,</span> <span class="s2">"frames_traj"</span><span class="p">,</span> <span class="s2">"fps_proceso"</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)[</span><span class="n">cols</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">short_all</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">TR</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">elegir_tracker</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">M</span><span class="p">[(</span><span class="n">M</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="s2">"GLOBAL"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">M</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">DECISION</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">G</span><span class="p">[</span><span class="s2">"_k1"</span><span class="p">]</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">ids_por_ave</span> <span class="o">+</span> <span class="n">G</span><span class="o">.</span><span class="n">IDSW</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"_k1"</span><span class="p">,</span> <span class="s2">"IDF1"</span><span class="p">,</span> <span class="s2">"MOTA"</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+    <span class="n">best</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s2">"_k1"</span><span class="p">,</span> <span class="s2">"IDF1"</span><span class="p">,</span> <span class="s2">"MOTA"</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">tied</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">config</span> <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">G</span><span class="o">.</span><span class="n">config</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="s2">"_k1"</span><span class="p">,</span> <span class="s2">"IDF1"</span><span class="p">,</span> <span class="s2">"MOTA"</span><span class="p">]]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">==</span> <span class="n">best</span><span class="p">]</span>
+    <span class="n">bt</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tied</span> <span class="k">if</span> <span class="s2">"_bt_"</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">bt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">bt</span> <span class="k">else</span> <span class="n">G</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">tied</span><span class="p">,</span> <span class="n">G</span>
+
+<span class="n">M</span><span class="p">,</span> <span class="n">CORTOS</span><span class="p">,</span> <span class="n">TR</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"v1"</span><span class="p">,</span> <span class="s2">"v2"</span><span class="p">):</span>
+    <span class="n">M</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="n">CORTOS</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="n">TR</span> <span class="o">=</span> <span class="n">metricas_tracking</span><span class="p">(</span><span class="n">GT</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="n">VIDS_TEST</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"gt</span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span> <span class="n">M</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"gt</span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"metricas_tracking_test.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">elegida</span><span class="p">,</span> <span class="n">empate</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="n">elegir_tracker</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"GT </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">: elegida </span><span class="si">{</span><span class="n">elegida</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"(empate: "</span> <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">empate</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">empate</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">"_k1"</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">comparar</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="n">REF</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"gt</span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"metricas_tracking_test.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"config"</span><span class="p">,</span> <span class="s2">"video_id"</span><span class="p">],</span>
+             <span class="p">[</span><span class="s2">"TP"</span><span class="p">,</span> <span class="s2">"FP"</span><span class="p">,</span> <span class="s2">"IDSW"</span><span class="p">,</span> <span class="s2">"ids_por_ave"</span><span class="p">,</span> <span class="s2">"recall"</span><span class="p">,</span> <span class="s2">"MOTA"</span><span class="p">,</span> <span class="s2">"IDF1"</span><span class="p">],</span> <span class="n">nombre</span><span class="o">=</span><span class="sa">f</span><span class="s2">"tracking GT </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> frente a S5"</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">elegir_tracker</span><span class="p">(</span><span class="n">M</span><span class="p">[</span><span class="s2">"v1"</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">CFG</span><span class="p">[</span><span class="s2">"vigente"</span><span class="p">][</span><span class="s2">"tracker"</span><span class="p">],</span> <span class="s2">"la elección ya no coincide con D-09"</span>
 </pre></div>
 </div>
 </div>
@@ -7916,14 +8085,300 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'modelo': 'vda-small', 'input_size': {'i5bE_orig': 392, 'i5bE_flip': 392}, 'salida': 'disparidad relativa, mayor = más cerca'}
+<pre>GT v1: elegida b_nuevo_bt_combo 
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>config</th>
+<th>video_id</th>
+<th>tracker</th>
+<th>n_gt</th>
+<th>TP</th>
+<th>FN</th>
+<th>FP</th>
+<th>IDSW</th>
+<th>ids_por_ave</th>
+<th>ids_totales</th>
+<th>tracks_cortos</th>
+<th>recall</th>
+<th>precision</th>
+<th>MOTA</th>
+<th>IDF1</th>
+<th>IoU_medio</th>
+<th>segmentos</th>
+<th>frames_traj</th>
+<th>fps_proceso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>9</th>
+<td>b_nuevo_bt_combo</td>
+<td>GLOBAL</td>
+<td>bytetrack</td>
+<td>140</td>
+<td>115</td>
+<td>25</td>
+<td>27</td>
+<td>12</td>
+<td>15</td>
+<td>17</td>
+<td>2</td>
+<td>0.821</td>
+<td>0.810</td>
+<td>0.543</td>
+<td>0.532</td>
+<td>0.753</td>
+<td>12</td>
+<td>1333</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>a_nuevo_oc_combo</td>
+<td>GLOBAL</td>
+<td>ocsort</td>
+<td>140</td>
+<td>116</td>
+<td>24</td>
+<td>32</td>
+<td>18</td>
+<td>13</td>
+<td>13</td>
+<td>1</td>
+<td>0.829</td>
+<td>0.784</td>
+<td>0.471</td>
+<td>0.465</td>
+<td>0.753</td>
+<td>14</td>
+<td>1155</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>14</th>
+<td>c_nuevo_oc_base</td>
+<td>GLOBAL</td>
+<td>ocsort</td>
+<td>140</td>
+<td>116</td>
+<td>24</td>
+<td>39</td>
+<td>37</td>
+<td>28</td>
+<td>44</td>
+<td>16</td>
+<td>0.829</td>
+<td>0.748</td>
+<td>0.286</td>
+<td>0.427</td>
+<td>0.772</td>
+<td>22</td>
+<td>1158</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>19</th>
+<td>d_nuevo_bt_base</td>
+<td>GLOBAL</td>
+<td>bytetrack</td>
+<td>140</td>
+<td>113</td>
+<td>27</td>
+<td>35</td>
+<td>35</td>
+<td>33</td>
+<td>49</td>
+<td>22</td>
+<td>0.807</td>
+<td>0.764</td>
+<td>0.307</td>
+<td>0.424</td>
+<td>0.763</td>
+<td>17</td>
+<td>1279</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ tracking GT v1 frente a S5: 25 filas, diferencia máxima 0 (tolerancia 0.01)
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>i5bE (601, 392, 697) float16 | frames esperados 601 ✓
+<pre>GT v2: elegida b_nuevo_bt_combo 
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>config</th>
+<th>video_id</th>
+<th>tracker</th>
+<th>n_gt</th>
+<th>TP</th>
+<th>FN</th>
+<th>FP</th>
+<th>IDSW</th>
+<th>ids_por_ave</th>
+<th>ids_totales</th>
+<th>tracks_cortos</th>
+<th>recall</th>
+<th>precision</th>
+<th>MOTA</th>
+<th>IDF1</th>
+<th>IoU_medio</th>
+<th>segmentos</th>
+<th>frames_traj</th>
+<th>fps_proceso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>9</th>
+<td>b_nuevo_bt_combo</td>
+<td>GLOBAL</td>
+<td>bytetrack</td>
+<td>177</td>
+<td>128</td>
+<td>49</td>
+<td>14</td>
+<td>16</td>
+<td>16</td>
+<td>17</td>
+<td>2</td>
+<td>0.723</td>
+<td>0.901</td>
+<td>0.554</td>
+<td>0.489</td>
+<td>0.746</td>
+<td>12</td>
+<td>1333</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>a_nuevo_oc_combo</td>
+<td>GLOBAL</td>
+<td>ocsort</td>
+<td>177</td>
+<td>130</td>
+<td>47</td>
+<td>18</td>
+<td>20</td>
+<td>13</td>
+<td>13</td>
+<td>1</td>
+<td>0.734</td>
+<td>0.878</td>
+<td>0.520</td>
+<td>0.474</td>
+<td>0.743</td>
+<td>14</td>
+<td>1155</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>19</th>
+<td>d_nuevo_bt_base</td>
+<td>GLOBAL</td>
+<td>bytetrack</td>
+<td>177</td>
+<td>125</td>
+<td>52</td>
+<td>23</td>
+<td>40</td>
+<td>33</td>
+<td>49</td>
+<td>22</td>
+<td>0.706</td>
+<td>0.845</td>
+<td>0.350</td>
+<td>0.394</td>
+<td>0.755</td>
+<td>17</td>
+<td>1279</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>14</th>
+<td>c_nuevo_oc_base</td>
+<td>GLOBAL</td>
+<td>ocsort</td>
+<td>177</td>
+<td>128</td>
+<td>49</td>
+<td>27</td>
+<td>43</td>
+<td>31</td>
+<td>44</td>
+<td>16</td>
+<td>0.723</td>
+<td>0.826</td>
+<td>0.328</td>
+<td>0.398</td>
+<td>0.765</td>
+<td>22</td>
+<td>1158</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ tracking GT v2 frente a S5: 25 filas, diferencia máxima 0 (tolerancia 0.01)
 </pre>
 </div>
 </div>
@@ -7936,8 +8391,532 @@ S8 usó 392 (6 GB en la laptop, sin xFormers). <strong>Cambiarla mueve <code>z_n
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Conclusi%C3%B3n-(S8)">Conclusión (S8)<a class="anchor-link" href="#Conclusi%C3%B3n-(S8)">¶</a></h2><p>Los mapas de VDA Small tienen consistencia temporal (el modelo procesa el video completo), cosa que YOLO26-Depth
-cuadro a cuadro no da (D-13). Se usan <strong>solo</strong> para leer la profundidad relativa en los 7 puntos (notebook 06).</p>
+<h2 id="3.-Rejilla-de-uni%C3%B3n-en-vv-+-4-train_-(S5)">3. Rejilla de unión en vv + 4 <code>train_</code> (S5)<a class="anchor-link" href="#3.-Rejilla-de-uni%C3%B3n-en-vv-+-4-train_-(S5)">¶</a></h2><p>El ajuste se hace en videos que <strong>sí</strong> vio el detector (vv y cuatro <code>train_</code> de YouTube), para no gastar la prueba.
+Hueco de 0,25 a 5 s × distancia de 1 a 4 veces el lado medio de la caja. Criterio fijado antes de mirar: mínimos
+puentes falsos, luego mayor IDF1 de visita, luego menos segmentos por visita.</p>
+<p>La rejilla eligió 0,5 s × 4; en <code>test_</code> dibujaba rectas largas en J4PK, así que Yilber eligió la <strong>prudente</strong>
+(1 s × 2,5) con la GT v2 (sección 4).</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Portado de video-val/resultados/tracking_v2/union/union.py</span>
+<span class="n">GRID</span> <span class="o">=</span> <span class="p">[(</span><span class="n">g</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+
+<span class="c1"># Portado de video-val/resultados/tracking_v2/union/union.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="n">vids</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span> <span class="n">configs</span><span class="p">,</span> <span class="n">rol</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s2">"rol"</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rol</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">get_tracks</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span> <span class="n">cuts</span> <span class="o">=</span> <span class="n">scene_cuts</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">"path"</span><span class="p">]);</span> <span class="n">g</span> <span class="o">=</span> <span class="n">GT</span><span class="p">[</span><span class="n">GT</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="n">vid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">traj</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">visit_metrics</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">video_id</span><span class="o">=</span><span class="n">vid</span><span class="p">,</span> <span class="n">rol</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s2">"rol"</span><span class="p">],</span> <span class="n">cortes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">cuts</span><span class="p">),</span> <span class="o">**</span><span class="n">m</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
+                <span class="n">gv</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">split</span> <span class="o">==</span> <span class="s2">"valid"</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gv</span><span class="p">):</span>
+                    <span class="n">mv</span> <span class="o">=</span> <span class="n">visit_metrics</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">gv</span><span class="p">)</span>
+                    <span class="n">rows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cobertura_valid</span><span class="o">=</span><span class="n">mv</span><span class="p">[</span><span class="s2">"cobertura"</span><span class="p">],</span> <span class="n">cajas_valid</span><span class="o">=</span><span class="n">mv</span><span class="p">[</span><span class="s2">"cajas"</span><span class="p">])</span>
+                <span class="n">extra</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+<span class="n">VIDS_AJUSTE</span> <span class="o">=</span> <span class="n">videos</span><span class="p">((</span><span class="s2">"vv"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">),</span> <span class="n">solo_ajuste_union</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">omitir_faltantes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">FALTAN</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se omite la rejilla: faltan los videos"</span><span class="p">,</span> <span class="n">FALTAN</span><span class="p">,</span> <span class="s2">"(los vv son de Adobe Stock; ver docs/guia_replicacion.md)"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">GT_U</span> <span class="o">=</span> <span class="n">cargar_gt_union</span><span class="p">({</span><span class="o">**</span><span class="n">VIDS_AJUSTE</span><span class="p">,</span> <span class="o">**</span><span class="n">VIDS_TEST</span><span class="p">})</span>
+    <span class="n">UCONF</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"actual_30f_1.5"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_reference</span><span class="p">(</span><span class="n">tr</span><span class="p">)}</span>
+    <span class="k">for</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">GRID</span><span class="p">:</span>
+        <span class="n">UCONF</span><span class="p">[</span><span class="sa">f</span><span class="s2">"g</span><span class="si">{</span><span class="n">gs</span><span class="si">}</span><span class="s2">s_d</span><span class="si">{</span><span class="n">dm</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_tuned</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">cuts</span><span class="p">))(</span><span class="n">gs</span><span class="p">,</span> <span class="n">dm</span><span class="p">)</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">VIDS_AJUSTE</span><span class="p">,</span> <span class="n">GT_U</span><span class="p">,</span> <span class="n">UCONF</span><span class="p">,</span> <span class="p">{</span><span class="s2">"vv"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">},</span> <span class="n">extra</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">R</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_rejilla_por_video.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="n">aggregate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">"records"</span><span class="p">)))</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">R</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"config"</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)])</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_rejilla.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ELEGIDA por la rejilla:"</span><span class="p">,</span> <span class="n">A</span><span class="p">[</span><span class="n">A</span><span class="o">.</span><span class="n">config</span> <span class="o">!=</span> <span class="s2">"actual_30f_1.5"</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">comparar</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">REF</span> <span class="o">/</span> <span class="s2">"union_rejilla.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"config"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">,</span> <span class="s2">"cobertura"</span><span class="p">],</span>
+             <span class="n">nombre</span><span class="o">=</span><span class="s2">"rejilla de unión frente a S5"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>ELEGIDA por la rejilla: g0.5s_d4
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>config</th>
+<th>visitas</th>
+<th>cajas</th>
+<th>cubiertas</th>
+<th>pred_en_gt</th>
+<th>idtp</th>
+<th>visitas_sin_segmento</th>
+<th>puentes_falsos</th>
+<th>segmentos</th>
+<th>seg_por_visita</th>
+<th>cobertura</th>
+<th>IDF1_visita</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>g0.5s_d4</td>
+<td>11</td>
+<td>372</td>
+<td>342</td>
+<td>367</td>
+<td>338</td>
+<td>1</td>
+<td>1</td>
+<td>9</td>
+<td>1.0</td>
+<td>0.919</td>
+<td>0.915</td>
+</tr>
+<tr>
+<th>1</th>
+<td>g1s_d4</td>
+<td>11</td>
+<td>372</td>
+<td>342</td>
+<td>367</td>
+<td>338</td>
+<td>1</td>
+<td>1</td>
+<td>9</td>
+<td>1.0</td>
+<td>0.919</td>
+<td>0.915</td>
+</tr>
+<tr>
+<th>2</th>
+<td>g2s_d4</td>
+<td>11</td>
+<td>372</td>
+<td>342</td>
+<td>367</td>
+<td>338</td>
+<td>1</td>
+<td>1</td>
+<td>9</td>
+<td>1.0</td>
+<td>0.919</td>
+<td>0.915</td>
+</tr>
+<tr>
+<th>3</th>
+<td>g0.5s_d2.5</td>
+<td>11</td>
+<td>372</td>
+<td>342</td>
+<td>366</td>
+<td>333</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>1.1</td>
+<td>0.919</td>
+<td>0.902</td>
+</tr>
+<tr>
+<th>4</th>
+<td>g1s_d2.5</td>
+<td>11</td>
+<td>372</td>
+<td>342</td>
+<td>366</td>
+<td>333</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>1.1</td>
+<td>0.919</td>
+<td>0.902</td>
+</tr>
+<tr>
+<th>5</th>
+<td>g2s_d2.5</td>
+<td>11</td>
+<td>372</td>
+<td>342</td>
+<td>366</td>
+<td>333</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>1.1</td>
+<td>0.919</td>
+<td>0.902</td>
+</tr>
+<tr>
+<th>6</th>
+<td>actual_30f_1.5</td>
+<td>11</td>
+<td>372</td>
+<td>335</td>
+<td>358</td>
+<td>325</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>1.1</td>
+<td>0.901</td>
+<td>0.890</td>
+</tr>
+<tr>
+<th>7</th>
+<td>g0.5s_d1.5</td>
+<td>11</td>
+<td>372</td>
+<td>341</td>
+<td>364</td>
+<td>322</td>
+<td>1</td>
+<td>1</td>
+<td>15</td>
+<td>1.5</td>
+<td>0.917</td>
+<td>0.875</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ rejilla de unión frente a S5: 25 filas, diferencia máxima 0 (tolerancia 0.01)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="4.-Confirmaci%C3%B3n-en-test_-con-GT-v1-y-GT-v2-(D-10)">4. Confirmación en <code>test_</code> con GT v1 y GT v2 (D-10)<a class="anchor-link" href="#4.-Confirmaci%C3%B3n-en-test_-con-GT-v1-y-GT-v2-(D-10)">¶</a></h2><p>Una sola pasada con las tres uniones candidatas. Criterio: mínimos puentes falsos, luego mayor IDF1 de visita,
+luego menos puentes largos.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Portado de video-val/resultados/tracking_v2/eval_gt2/union_gt2.py</span>
+<span class="n">UNION_TEST</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"actual_30f_1.5"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_reference</span><span class="p">(</span><span class="n">tr</span><span class="p">),</span>
+    <span class="s2">"elegida_0.5s_4"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_tuned</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">cuts</span><span class="p">),</span>
+    <span class="s2">"prudente_1s_2.5"</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">:</span> <span class="n">union_tuned</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">cuts</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">rows</span><span class="p">,</span> <span class="n">br_rows</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">gt_name</span><span class="p">,</span> <span class="n">g_all</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"GT_v1"</span><span class="p">,</span> <span class="n">GT</span><span class="p">[</span><span class="s2">"v1"</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"GT_v2"</span><span class="p">,</span> <span class="n">GT</span><span class="p">[</span><span class="s2">"v2"</span><span class="p">])):</span>
+    <span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VIDS_TEST</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">tr</span> <span class="o">=</span> <span class="n">get_tracks</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span> <span class="n">cuts</span> <span class="o">=</span> <span class="n">scene_cuts</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">"path"</span><span class="p">]);</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g_all</span><span class="p">[</span><span class="n">g_all</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="n">vid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">UNION_TEST</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">traj</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">visit_metrics</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="n">br</span><span class="p">,</span> <span class="n">n_long</span> <span class="o">=</span> <span class="n">bridges</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="s2">"W"</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s2">"H"</span><span class="p">])</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="n">gt_name</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">video_id</span><span class="o">=</span><span class="n">vid</span><span class="p">,</span> <span class="o">**</span><span class="n">m</span><span class="p">,</span> <span class="n">puentes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">br</span><span class="p">),</span> <span class="n">puentes_largos</span><span class="o">=</span><span class="n">n_long</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">gt_name</span> <span class="o">==</span> <span class="s2">"GT_v2"</span><span class="p">:</span>
+                <span class="n">br_rows</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">video_id</span><span class="o">=</span><span class="n">vid</span><span class="p">,</span> <span class="o">**</span><span class="n">b</span><span class="p">,</span> <span class="n">largo</span><span class="o">=</span><span class="n">b</span><span class="p">[</span><span class="s2">"long_px"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">"W"</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s2">"H"</span><span class="p">])</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">br</span><span class="p">]</span>
+<span class="n">RT</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="n">agg</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">gt</span><span class="o">=</span><span class="n">gt</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">video_id</span><span class="o">=</span><span class="s2">"GLOBAL"</span><span class="p">,</span> <span class="o">**</span><span class="n">aggregate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">"records"</span><span class="p">)),</span> <span class="n">puentes</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">puentes</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+            <span class="n">puentes_largos</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">puentes_largos</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span> <span class="k">for</span> <span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">RT</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"gt"</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">],</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+<span class="n">RT</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">RT</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">agg</span><span class="p">)],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">RT</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"union_test_gt1_gt2.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">br_rows</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"puentes_gt2.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">G2</span> <span class="o">=</span> <span class="n">RT</span><span class="p">[(</span><span class="n">RT</span><span class="p">[</span><span class="s2">"gt"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"GT_v2"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">RT</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="s2">"GLOBAL"</span><span class="p">)]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"puentes_largos"</span><span class="p">],</span>
+                                                                        <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"GANADORA (GT v2):"</span><span class="p">,</span> <span class="n">G2</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">display</span><span class="p">(</span><span class="n">RT</span><span class="p">[</span><span class="n">RT</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="s2">"GLOBAL"</span><span class="p">][[</span><span class="s2">"gt"</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">,</span> <span class="s2">"visitas"</span><span class="p">,</span> <span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"seg_por_visita"</span><span class="p">,</span>
+                                      <span class="s2">"cobertura"</span><span class="p">,</span> <span class="s2">"segmentos"</span><span class="p">,</span> <span class="s2">"puentes"</span><span class="p">,</span> <span class="s2">"puentes_largos"</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">comparar</span><span class="p">(</span><span class="n">RT</span><span class="p">,</span> <span class="n">REF</span> <span class="o">/</span> <span class="s2">"union_test_gt1_gt2.csv"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"gt"</span><span class="p">,</span> <span class="s2">"config"</span><span class="p">,</span> <span class="s2">"video_id"</span><span class="p">],</span>
+         <span class="p">[</span><span class="s2">"puentes_falsos"</span><span class="p">,</span> <span class="s2">"IDF1_visita"</span><span class="p">,</span> <span class="s2">"segmentos"</span><span class="p">,</span> <span class="s2">"puentes_largos"</span><span class="p">],</span> <span class="n">nombre</span><span class="o">=</span><span class="s2">"unión en test_ frente a S5"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>GANADORA (GT v2): actual_30f_1.5
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>gt</th>
+<th>config</th>
+<th>visitas</th>
+<th>puentes_falsos</th>
+<th>IDF1_visita</th>
+<th>seg_por_visita</th>
+<th>cobertura</th>
+<th>segmentos</th>
+<th>puentes</th>
+<th>puentes_largos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>24</th>
+<td>GT_v1</td>
+<td>actual_30f_1.5</td>
+<td>18</td>
+<td>5</td>
+<td>0.708</td>
+<td>1.083</td>
+<td>0.757</td>
+<td>12</td>
+<td>49</td>
+<td>6</td>
+</tr>
+<tr>
+<th>25</th>
+<td>GT_v1</td>
+<td>elegida_0.5s_4</td>
+<td>18</td>
+<td>8</td>
+<td>0.674</td>
+<td>1.071</td>
+<td>0.757</td>
+<td>8</td>
+<td>46</td>
+<td>4</td>
+</tr>
+<tr>
+<th>26</th>
+<td>GT_v1</td>
+<td>prudente_1s_2.5</td>
+<td>18</td>
+<td>7</td>
+<td>0.676</td>
+<td>1.000</td>
+<td>0.757</td>
+<td>7</td>
+<td>49</td>
+<td>3</td>
+</tr>
+<tr>
+<th>27</th>
+<td>GT_v2</td>
+<td>actual_30f_1.5</td>
+<td>5</td>
+<td>0</td>
+<td>0.675</td>
+<td>2.000</td>
+<td>0.672</td>
+<td>12</td>
+<td>49</td>
+<td>6</td>
+</tr>
+<tr>
+<th>28</th>
+<td>GT_v2</td>
+<td>elegida_0.5s_4</td>
+<td>5</td>
+<td>0</td>
+<td>0.652</td>
+<td>1.600</td>
+<td>0.672</td>
+<td>8</td>
+<td>46</td>
+<td>4</td>
+</tr>
+<tr>
+<th>29</th>
+<td>GT_v2</td>
+<td>prudente_1s_2.5</td>
+<td>5</td>
+<td>0</td>
+<td>0.667</td>
+<td>1.400</td>
+<td>0.678</td>
+<td>7</td>
+<td>49</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ unión en test_ frente a S5: 30 filas, diferencia máxima 0 (tolerancia 0.01)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5.-Trayectorias-finales-(entrada-de-los-notebooks-04-y-06)">5. Trayectorias finales (entrada de los notebooks 04 y 06)<a class="anchor-link" href="#5.-Trayectorias-finales-(entrada-de-los-notebooks-04-y-06)">¶</a></h2><p>Unión prudente sobre ByteTrack combo, con la columna <code>es_puente</code>. Se escriben en <code>runs/03/trayectorias_prudente/</code>
+y se comparan fila a fila con las de S5 (<code>resultados/S5_tracking_union_test/trayectorias_prudente/</code>), que son las que
+leen 04 y 06 en modo <code>artefactos</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=11">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fin</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"trayectorias_prudente"</span><span class="p">;</span> <span class="n">fin</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">vid</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">VIDS_TEST</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">tr</span> <span class="o">=</span> <span class="n">get_tracks</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span> <span class="n">cuts</span> <span class="o">=</span> <span class="n">scene_cuts</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">"path"</span><span class="p">]);</span> <span class="n">g</span> <span class="o">=</span> <span class="n">GT</span><span class="p">[</span><span class="s2">"v2"</span><span class="p">][</span><span class="n">GT</span><span class="p">[</span><span class="s2">"v2"</span><span class="p">]</span><span class="o">.</span><span class="n">video_id</span> <span class="o">==</span> <span class="n">vid</span><span class="p">]</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="n">union_vigente</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">cuts</span><span class="p">)</span>
+    <span class="n">traj</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fin</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"trayectoria_</span><span class="si">{</span><span class="n">vid</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">visit_metrics</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">g</span><span class="p">);</span> <span class="n">_</span><span class="p">,</span> <span class="n">n_long</span> <span class="o">=</span> <span class="n">bridges</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="s2">"W"</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s2">"H"</span><span class="p">])</span>
+    <span class="n">draw</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">"path"</span><span class="p">],</span> <span class="n">traj</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">corto</span><span class="p">(</span><span class="n">vid</span><span class="p">)</span><span class="si">}</span><span class="s2"> | prudente_1s_2.5 | seg </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s1">'segmentos'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | visitas </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s1">'visitas'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | "</span>
+         <span class="sa">f</span><span class="s2">"puentes falsos </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s1">'puentes_falsos'</span><span class="p">]</span><span class="si">}</span><span class="s2"> | largos </span><span class="si">{</span><span class="n">n_long</span><span class="si">}</span><span class="s2"> | IDF1v </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s1">'IDF1_visita'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">fin</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"trayectoria_</span><span class="si">{</span><span class="n">vid</span><span class="si">}</span><span class="s2">.png"</span><span class="p">)</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">REF</span> <span class="o">/</span> <span class="s2">"trayectorias_prudente"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"trayectoria_</span><span class="si">{</span><span class="n">vid</span><span class="si">}</span><span class="s2">.csv"</span>
+    <span class="k">if</span> <span class="n">ref</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">comparar</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="p">[</span><span class="s2">"frame"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"cx_px"</span><span class="p">,</span> <span class="s2">"cy_px"</span><span class="p">,</span> <span class="s2">"segment_id"</span><span class="p">],</span> <span class="n">tol</span><span class="o">=</span><span class="n">TOL</span><span class="p">[</span><span class="s2">"px"</span><span class="p">],</span> <span class="n">nombre</span><span class="o">=</span><span class="sa">f</span><span class="s2">"trayectoria </span><span class="si">{</span><span class="n">corto</span><span class="p">(</span><span class="n">vid</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ trayectoria DoJ1: 151 filas, diferencia máxima 0 (tolerancia 1.0)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ trayectoria Gu30: 246 filas, diferencia máxima 0 (tolerancia 1.0)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ trayectoria i5bE: 440 filas, diferencia máxima 0 (tolerancia 1.0)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>✓ trayectoria J4PK: 589 filas, diferencia máxima 0 (tolerancia 1.0)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Conclusiones-(S5)">Conclusiones (S5)<a class="anchor-link" href="#Conclusiones-(S5)">¶</a></h2><ul>
+<li><strong>Tracker (D-09):</strong> ByteTrack combo (<code>track_buffer</code> 300, <code>match_thresh</code> 0,95, <code>new_track_thresh</code> 0,5) con el
+detector <code>yolo26n_ft_v2</code>. Gana por el criterio fijado y por desempate a favor de ByteTrack.</li>
+<li><strong>Unión (D-10):</strong> prudente, 1 s y 2,5×. Con la GT v2: IDF1 de visita 0,667, <strong>0 puentes falsos</strong> y 3 puentes largos.
+La elegida por la rejilla (0,5 s × 4) dibujaba rectas largas en J4PK.</li>
+<li><strong>Incremento:</strong> trayectorias por visita de los 4 videos de prueba, con los puentes marcados, listas para 04.</li>
+<li><strong>Límite:</strong> la prueba son 4 videos y 216 frames etiquetados; cada cifra es de un solo ave por video.</li>
+</ul>
 </div>
 </div>
 </div>
