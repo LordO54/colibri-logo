@@ -40,10 +40,12 @@ git checkout 4f5ae23172ba60fd7bc11ef671cca678842c7072   # commit usado en S8 (20
 cd D:\video_eval
 py -3.11 -m venv .venv_vda
 .venv_vda\Scripts\activate
-pip install -r modelos\Video-Depth-Anything\requirements.txt
-pip install -r colibri-logo\entornos\requirements-vda.txt
+pip install -r colibri-logo\entornos\requirements-vda.txt   # torch 2.6.0+cu124, easydict, einops...
 python -m ipykernel install --user --name colibri-vda --display-name "Python (colibri vda)"
 ```
+
+No instales el `requirements.txt` del repo de VDA: fija torch 2.1.1, y los mapas de S8 se calcularon con torch 2.6.0.
+El checkpoint Small se descarga de Hugging Face (`depth-anything/Video-Depth-Anything-Small`).
 
 Solo el modelo **Small** (Apache-2.0). Base y Large son CC-BY-NC (D-17).
 

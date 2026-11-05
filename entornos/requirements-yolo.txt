@@ -102,3 +102,5 @@ urllib3==2.8.0
 wcwidth==0.9.4
 webencodings==0.6.1
 nbstripout==0.9.1
+# Descarga de los videos de YouTube (notebook 01, sección 1); no estaba en el freeze
+yt-dlp
