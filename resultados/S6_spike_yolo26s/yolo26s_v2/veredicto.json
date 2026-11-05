@@ -1,0 +1,19 @@
+{
+  "adoptar_yolo26s": false,
+  "comprobaciones": {
+    "recall_test_+3pts": false,
+    "cobertura_trayectoria_mejora": false,
+    "precision_test_no_baja_>2pts": false,
+    "ds2_mAP50_no_baja_>2pts": true
+  },
+  "valores": {
+    "R_test_n": 0.7339337828569148,
+    "R_test_s": 0.6779661016949152,
+    "P_test_n": 0.8842795057597826,
+    "P_test_s": 0.7391600292341995,
+    "cobertura_n": 0.6779661016949152,
+    "cobertura_s": 0.5310734463276836,
+    "ds2_mAP50_n": 0.9627615568010373,
+    "ds2_mAP50_s": 0.9620867695086219
+  }
+}

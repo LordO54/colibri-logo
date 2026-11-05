@@ -35,7 +35,7 @@ python -m ipykernel install --user --name colibri-yolo --display-name "Python (c
 cd D:\video_eval\modelos
 git clone https://github.com/DepthAnything/Video-Depth-Anything
 cd Video-Depth-Anything
-git checkout <commit usado en S8: se fija al validar en la laptop>
+git checkout 4f5ae23172ba60fd7bc11ef671cca678842c7072   # commit usado en S8 (2025-10-07)
 # checkpoint Small (Apache-2.0): checkpoints\video_depth_anything_vits.pth
 cd D:\video_eval
 py -3.11 -m venv .venv_vda
@@ -46,6 +46,11 @@ python -m ipykernel install --user --name colibri-vda --display-name "Python (co
 ```
 
 Solo el modelo **Small** (Apache-2.0). Base y Large son CC-BY-NC (D-17).
+
+**En la laptop de referencia** `.venv_vda` no tiene un torch propio: solo instala `easydict` y `einops`, y reutiliza
+los paquetes de `.venv` mediante `.venv_vda\Lib\site-packages\_venv_principal.pth`. Los mapas de S8 se calcularon así,
+con torch 2.6.0+cu124 (no con el torch 2.1.1 que fija el `requirements.txt` de VDA) y sin xFormers.
+`requirements-vda.txt` es el `pip freeze` de ese entorno, así que sirve para crear uno independiente con las mismas versiones.
 
 ## 4. Git
 

@@ -1,0 +1,9 @@
+{
+  "fps_declared": 59.94005994005994,
+  "n_frames": 550,
+  "tracker": "bytetrack",
+  "video": "C:\\Users\\ACER\\Documents\\logo\\video-val\\train_Down.com_YouTube_Media_p8uUX2kbHh0_Ruby-throated-hummingbird_001_1080p.mp4",
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ft_v2\\best.pt",
+  "cfg": "D:\\video_eval\\reentreno\\v2\\tracking\\cfg\\tracker_b_nuevo_bt_combo.yaml",
+  "fps_proceso": 30.1
+}

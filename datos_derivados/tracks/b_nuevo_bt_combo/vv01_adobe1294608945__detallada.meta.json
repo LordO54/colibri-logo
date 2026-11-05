@@ -1,0 +1,9 @@
+{
+  "fps_declared": 50.0,
+  "n_frames": 768,
+  "tracker": "bytetrack",
+  "video": "C:\\Users\\ACER\\Documents\\logo\\video-val\\AdobeStock_1294608945.mov",
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ft_v2\\best.pt",
+  "cfg": "D:\\video_eval\\reentreno\\v2\\tracking\\cfg\\tracker_b_nuevo_bt_combo.yaml",
+  "fps_proceso": 25.5
+}

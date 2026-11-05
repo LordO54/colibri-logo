@@ -1,0 +1,25 @@
+{
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ds2_ds1\\best.pt",
+  "test_dir": "colibri_work\\data\\final\\test_video",
+  "imgsz": 640,
+  "AP50": 0.7952215744653426,
+  "P@0.25": 0.8426966292134831,
+  "R@0.25": 0.8620689655172413,
+  "n_gt": 174,
+  "recall_por_tamano": {
+    "grande(>=96px)": {
+      "recall": 0.8620689655172413,
+      "n": 174
+    }
+  },
+  "linea_base_coco_bird": {
+    "AP50": 0.7077761645187375,
+    "P@0.25": 0.7583333333333333,
+    "R@0.25": 0.5229885057471264
+  },
+  "delta_vs_base": {
+    "AP50": 0.0874454099466051,
+    "P@0.25": 0.08436329588014979,
+    "R@0.25": 0.3390804597701149
+  }
+}

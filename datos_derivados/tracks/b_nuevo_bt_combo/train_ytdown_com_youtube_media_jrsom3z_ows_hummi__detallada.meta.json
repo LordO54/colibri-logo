@@ -1,0 +1,9 @@
+{
+  "fps_declared": 14.985014985014985,
+  "n_frames": 453,
+  "tracker": "bytetrack",
+  "video": "C:\\Users\\ACER\\Documents\\logo\\video-val\\train_YTDown.com_YouTube_Media_JrsOM3Z-ows_hummingbird-visits-feeder-on-deck_001_2160p.mp4",
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ft_v2\\best.pt",
+  "cfg": "D:\\video_eval\\reentreno\\v2\\tracking\\cfg\\tracker_b_nuevo_bt_combo.yaml",
+  "fps_proceso": 20.0
+}

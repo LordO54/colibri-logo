@@ -26,6 +26,8 @@ Cada decisión indica la fecha, quién la tomó, la evidencia y las alternativas
 | D-19 | 04-nov | S9 | **Un repositorio git (`colibri-logo`) con dos entornos** (`yolo` y `vda`, un kernel por notebook); el código suelto pasa a notebooks 00-06 con las funciones compartidas en `00_comun`; los datos pesados viven fuera de git en `D:\video_eval\datos` | Yilber | `docs/historico/propuesta_estructura_v2.md` | Dos repos (entrenamiento y 3D); reorganizar carpetas en `logo/` sin git |
 | D-20 | 04-nov | S9 | `humming` se publica **solo como etiquetas**, GT v2 y manifiestos en el repo, con un notebook que regenera los frames desde los videos; no se publican imágenes en Roboflow | Yilber | Los frames son de Adobe Stock y YouTube (no redistribuibles) | Hacer público el proyecto de Roboflow con imágenes |
 
+**Nota a D-05 (05-nov, validación S9):** con los frames de la prueba vv regenerados desde los videos (otra compresión JPEG), la ablación solo ds2 da AP50 0,812 frente a 0,795 de ds2+ds1. Con las imágenes originales se reproducen 0,790 y 0,795. La ventaja de ds2+ds1 sobre ds2 queda dentro de lo que mueve la recompresión: no es significativa. D-05 deja de importar porque D-08 la sustituye.
+
 ## Decisiones abiertas
 
 - Método final de 7 puntos para E-03: uniforme, salientes o híbrido (CA-02.6.6).

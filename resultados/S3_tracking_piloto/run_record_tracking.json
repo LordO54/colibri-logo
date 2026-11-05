@@ -1,0 +1,76 @@
+{
+  "created": "2026-11-01T13:03:06",
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ds2_ds1\\best.pt",
+  "ultralytics": "8.4.197",
+  "torch": "2.6.0+cu124",
+  "cuda": true,
+  "imgsz": 640,
+  "conf_call": 0.1,
+  "iou_match": 0.5,
+  "tracker_elegido": "ocsort",
+  "barrido": {
+    "n_corridas": 25,
+    "mejor": {
+      "corrida": "bt_combo",
+      "tracker": "bytetrack",
+      "params": "{\"track_buffer\": 300, \"match_thresh\": 0.95, \"new_track_thresh\": 0.5}"
+    }
+  },
+  "trackers": {
+    "bytetrack": {
+      "tracker_type": "bytetrack",
+      "track_high_thresh": 0.25,
+      "track_low_thresh": 0.1,
+      "new_track_thresh": 0.25,
+      "track_buffer": 60,
+      "match_thresh": 0.8,
+      "fuse_score": true
+    },
+    "ocsort": {
+      "tracker_type": "ocsort",
+      "track_high_thresh": 0.25,
+      "track_low_thresh": 0.1,
+      "new_track_thresh": 0.25,
+      "track_buffer": 60,
+      "match_thresh": 0.8,
+      "fuse_score": true,
+      "delta_t": 3,
+      "inertia": 0.2,
+      "use_byte": true
+    }
+  },
+  "metricas_agregadas": {
+    "bytetrack": {
+      "n_gt": 174,
+      "TP": 143,
+      "FN": 31,
+      "FP": 29,
+      "IDSW": 4,
+      "ids_por_ave": 7,
+      "ids_totales": 7,
+      "recall": 0.8218390805,
+      "precision": 0.8313953488,
+      "MOTA": 0.632183908,
+      "IDF1": 0.6820809249
+    },
+    "ocsort": {
+      "n_gt": 174,
+      "TP": 143,
+      "FN": 31,
+      "FP": 29,
+      "IDSW": 3,
+      "ids_por_ave": 5,
+      "ids_totales": 6,
+      "recall": 0.8218390805,
+      "precision": 0.8313953488,
+      "MOTA": 0.6379310345,
+      "IDF1": 0.6878612717
+    }
+  },
+  "trayectoria": {
+    "interp_max_gap": 10,
+    "join_max_gap": 30,
+    "join_max_dist": 1.5,
+    "min_frag_len": 15
+  }
+}

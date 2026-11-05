@@ -69,6 +69,8 @@ Cada notebook empieza con una tabla de lo que reproduce y termina con las conclu
 5. **Resultados:** ejecuta `03`, `04`, `05` (kernel vda) y `06` en modo `artefactos`. Para reentrenar, ejecuta `02` con
    `COLIBRI_MODO=recalcular`.
 
+**Límite conocido:** los frames regenerados no son los mismos JPEG que los originales. Las cifras globales se mantienen (mAP50 de `yolo26n_ft_v2` 0,877), pero las métricas de detección **por video** del notebook 02 pueden moverse hasta 0,10. Los notebooks 03 a 06 no dependen de eso y reproducen sus cifras con diferencia 0.
+
 **Qué no se puede regenerar** y por eso está congelado en el repo: las etiquetas corregidas a mano (humming v1 y v2,
 prueba vv), la revisión a ciegas de Yilber y la selección de puntos `delante` de i5bE.
 
@@ -88,4 +90,5 @@ prueba vv), la revisión a ciegas de Yilber y la selección de puntos `delante` 
 - La clave de Roboflow solo vive en `.env`; nunca en notebooks, salidas ni git.
 - Las trayectorias detalladas y las cifras de referencia no se sobrescriben: lo nuevo va a `runs/`.
 - Los `test_` no entran nunca en entrenamiento ni en validación (D-07).
+- Las figuras con cuadros de video (fondos, recortes) no se suben: se regeneran en `runs/` (`.gitignore`).
 - Cada función existe una sola vez (`00_comun`). Las salidas de los notebooks se limpian al hacer commit (`nbstripout`).

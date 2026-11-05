@@ -16,4 +16,4 @@ desde los videos y Roboflow con el notebook 01.
 | `profundidad/puntos_i5bE_salientes_delante.csv`, `seleccion_delante.json` | variante `delante` (D-15) | 06 |
 | `profundidad/revision_ciega/` | plantilla con las respuestas de Yilber y clave | 06 |
 
-**Estado:** `fuentes.csv` ya está; el resto se copia desde la laptop (ver `docs/mapa_rutas.csv`).
+**Estado:** copiado desde la laptop el 04-nov-2026 (ver `docs/mapa_rutas.csv`). `verificacion_delante.jpg` está en la laptop pero `.gitignore` lo deja fuera del repo.

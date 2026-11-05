@@ -1,0 +1,2 @@
+backend,video,frames,variacion_fondo_pct,autocorr_z_05s,autocorr_znorm_05s,jitter_rel_z,jitter_rel_znorm,pasa_filtro
+yolo26_yolo26s-depth,i5bE,387,4.672675579786301,0.6309839007973523,0.5406785704540714,0.07748561457848067,0.07593256132067545,True

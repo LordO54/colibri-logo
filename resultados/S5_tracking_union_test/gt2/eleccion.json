@@ -1,0 +1,7 @@
+{
+  "elegida": "b_nuevo_bt_combo",
+  "empate": [
+    "b_nuevo_bt_combo"
+  ],
+  "criterio": "min(ids_por_ave + IDSW), luego max IDF1, luego max MOTA; ByteTrack si empatan"
+}

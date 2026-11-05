@@ -1,0 +1,4 @@
+video_id,file,fps,frames,width,height,duration_s,sample_step
+vv01_adobe1294608945,AdobeStock_1294608945.mov,50.0,768,1920,1080,15.36,8
+vv02_adobe512464022,AdobeStock_512464022.mov,29.97,491,1920,1080,16.38,5
+vv03_florisuga_file,"Flying White-necked Jacobin next to pinky red flower. Hummingbird Florisuga mellivora, from Rancho Naturalista in Costa Rica in the nature habitat.mov",29.97,256,1920,1080,8.54,5

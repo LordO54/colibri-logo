@@ -30,3 +30,10 @@ datos/
 # Imágenes de datasets (las figuras de resultados sí se versionan)
 datos_derivados/**/*.jpg
 datos_derivados/**/*.png
+
+# Figuras con cuadros de video (Adobe Stock / YouTube): no se redistribuyen (D-20).
+# Los notebooks las regeneran en runs/; en resultados/ solo van trazos y gráficas sin fondo.
+*_fondo.png
+tira_*.jpg
+resultados/**/trayectoria_*.png
+trayectorias_comparacion.png

@@ -1,0 +1,15 @@
+config,video_id,cobertura,cobertura_valid,cajas_valid
+actual_30f_1.5,vv01_adobe1294608945,0.8961038961038961,0.0,0
+g0.5s_d4,vv01_adobe1294608945,0.8961038961038961,0.0,0
+actual_30f_1.5,vv02_adobe512464022,1.0,0.0,0
+g0.5s_d4,vv02_adobe512464022,1.0,0.0,0
+actual_30f_1.5,vv03_florisuga_file,0.9459459459459459,1.0,1
+g0.5s_d4,vv03_florisuga_file,0.9459459459459459,1.0,1
+actual_30f_1.5,train_down_com_youtube_media_p8uux2kbhh0_ruby_th,0.7878787878787878,0.14285714285714285,7
+g0.5s_d4,train_down_com_youtube_media_p8uux2kbhh0_ruby_th,0.9393939393939394,0.8571428571428571,7
+actual_30f_1.5,train_wn_com_youttrain_ube_media_kkimys9gove_hum,0.7666666666666667,0.0,0
+g0.5s_d4,train_wn_com_youttrain_ube_media_kkimys9gove_hum,0.8,0.0,0
+actual_30f_1.5,train_ytdown_com_youtube_media_jrsom3z_ows_hummi,0.9594594594594594,0.9375,16
+g0.5s_d4,train_ytdown_com_youtube_media_jrsom3z_ows_hummi,0.9594594594594594,0.9375,16
+actual_30f_1.5,train_ytdown_com_youtube_media_vimu4v2jgww_ruby,0.9032258064516129,1.0,5
+g0.5s_d4,train_ytdown_com_youtube_media_vimu4v2jgww_ruby,0.9032258064516129,1.0,5

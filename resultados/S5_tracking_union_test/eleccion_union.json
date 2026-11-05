@@ -1,0 +1,4 @@
+{
+  "elegida": "g0.5s_d4",
+  "criterio": "min puentes_falsos, luego max IDF1_visita, luego min seg_por_visita (rejilla en vv + train_)"
+}

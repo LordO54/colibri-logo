@@ -33,9 +33,13 @@ D:\video_eval\reentreno\v2\profundidad\siete_puntos\salidas\puntos_i5bE_saliente
 D:\video_eval\reentreno\v2\profundidad\siete_puntos\i5bE_punto2\{seleccion_delante.json;verificacion_delante.jpg},colibri-logo\datos_derivados\profundidad\,si,copiar,
 D:\video_eval\reentreno\v2\profundidad\adobe\revision_ciega\{plantilla_revision_ciega.csv;clave_revision_ciega.csv},colibri-logo\datos_derivados\profundidad\revision_ciega\,si,copiar,juicio humano de Yilber (congelado)
 D:\video_eval\reentreno\v2\profundidad\siete_puntos\salidas\comparacion_backends\ciega\*.{csv;jpg},colibri-logo\resultados\S8_exploracion_3d\ciega\,si,copiar,D-18
-D:\video_eval\reentreno\v2\profundidad\adobe\{trayectorias;puntos7}\*.csv,colibri-logo\resultados\S8_exploracion_3d\adobe\,si,copiar,
+D:\video_eval\reentreno\v2\profundidad\adobe\{trayectorias;puntos7}\*.csv,colibri-logo\resultados\S8_exploracion_3d\adobe\{trayectorias;puntos7}\,si,copiar,subcarpetas: las lee el notebook 06
 C:\Users\ACER\Documents\logo\video-val\resultados\profundidad\**\*.md,colibri-logo\resultados\S8_exploracion_3d\,si,copiar,decision_sp027 lectura informe
 D:\video_eval\reentreno\v2\profundidad\siete_puntos\cache_vda\*,D:\video_eval\runs\profundidad\cache_vda\,no,mover,mapas de VDA (cientos de MB)
 D:\video_eval\reentreno\v2\profundidad\siete_puntos\*-depth.pt,D:\video_eval\modelos\depth\,no,mover,
 D:\video_eval\colibri_work\reports\run_record.json,colibri-logo\resultados\S1_datos\,si,copiar,SHA1 de las particiones de S1
-D:\video_eval\colibri_work\reports\*,colibri-logo\resultados\{S2_detector_v1;S3_tracking_piloto}\,si,copiar,línea base, comparación S2 y barrido_trackers.csv de S3 (verificar nombres)
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26n_ds2_ds1\{eval_test_video.json;results.csv},colibri-logo\resultados\S2_detector_v1\,si,copiar,results.csv como results_yolo26n_ds2_ds1.csv
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26n_ds2\results.csv,colibri-logo\resultados\S2_detector_v1\results_yolo26n_ds2.csv,si,copiar,
+C:\Users\ACER\Documents\logo\video-val\resultados\yolo26n_ds2\best.pt,D:\video_eval\modelos\yolo26n_ds2\best.pt,no,copiar,ablación S2 (la usa el notebook 02)
+D:\video_eval\colibri_work\reports\dataset_cajas.png,colibri-logo\resultados\S2_detector_v1\,si,copiar,el resto de reports\ son imágenes de dataset y no se publican
+C:\Users\ACER\Documents\logo\video-val\resultados\tracking\{barrido_trackers.*;metricas_tracking_*.csv;resumen_trayectorias.csv;run_record_tracking.json;tracker_*.yaml;linea_tiempo_ids.png;trayectorias_comparacion.png},colibri-logo\resultados\S3_tracking_piloto\,si,copiar,
