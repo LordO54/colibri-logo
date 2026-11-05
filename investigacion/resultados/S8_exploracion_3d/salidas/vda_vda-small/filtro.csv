@@ -1,0 +1,2 @@
+backend,video,frames,variacion_fondo_pct,autocorr_z_05s,autocorr_znorm_05s,jitter_rel_z,jitter_rel_znorm,pasa_filtro
+vda_vda-small,i5bE,387,4.108397290110588,0.7499457748553495,0.7311739316027842,0.01273045545133658,0.012826037756980995,True

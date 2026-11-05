@@ -1,0 +1,15 @@
+vv    vv01_adobe1294608945: 768 frames @ 50.00 fps (15.4 s), candidatos 96, negros descartados 0, elegidos train 24 / valid 6 / test 0
+train adobestock_1600207728: 719 frames @ 60.00 fps (12.0 s), candidatos 120, negros descartados 0, elegidos train 22 / valid 6 / test 0
+vv    vv02_adobe512464022: 491 frames @ 29.97 fps (16.4 s), candidatos 99, negros descartados 0, elegidos train 28 / valid 9 / test 0
+vv    vv03_florisuga_file: 256 frames @ 29.97 fps (8.5 s), candidatos 52, negros descartados 0, elegidos train 11 / valid 2 / test 0
+test  test_ytdown_com_youtube_media_doj1xa6ksqm_colibr: 154 frames @ 24.00 fps (6.4 s), candidatos 20, negros descartados 0, elegidos train 0 / valid 0 / test 20
+test  test_ytdown_com_youtube_media_gu30nofexla_hummin: 285 frames @ 29.97 fps (9.5 s), candidatos 28, negros descartados 1, elegidos train 0 / valid 0 / test 28
+test  test_ytdown_com_youtube_media_i5befvb5mxg_ruby_t: 601 frames @ 29.97 fps (20.1 s), candidatos 61, negros descartados 0, elegidos train 0 / valid 0 / test 61
+test  test_ytdown_com_youtube_media_j4pkgwgjaus_anna_s: 1076 frames @ 30.00 fps (35.9 s), candidatos 108, negros descartados 0, elegidos train 0 / valid 0 / test 108
+train train_down_com_youtube_media_p8uux2kbhh0_ruby_th: 550 frames @ 59.94 fps (9.2 s), candidatos 92, negros descartados 0, elegidos train 26 / valid 7 / test 0
+train train_wn_com_youttrain_ube_media_kkimys9gove_hum: 1889 frames @ 30.00 fps (63.0 s), candidatos 630, negros descartados 0, elegidos train 93 / valid 25 / test 0
+train train_ytdown_com_youtube_media_jrsom3z_ows_hummi: 453 frames @ 14.99 fps (30.2 s), candidatos 453, negros descartados 0, elegidos train 65 / valid 17 / test 0
+train train_ytdown_com_youtube_media_vimu4v2jgww_ruby: 262 frames @ 15.05 fps (17.4 s), candidatos 131, negros descartados 0, elegidos train 30 / valid 10 / test 0
+ALERTAS de fuga test-train: 0 frames; pares de video: ninguno
+TOTAL a subir: train 236 / valid 65 / test 217; vv ya etiquetados que entran: train 63 / valid 17
+Parámetros: {'model': 'C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ds2_ds1\\best.pt', 'imgsz': 640, 'conf': 0.25, 'vv_manifest': WindowsPath('C:/Users/ACER/Documents/logo/video-val/eval_frames/manifest_frames.csv'), 'vv_videos': WindowsPath('C:/Users/ACER/Documents/logo/video-val/eval_frames/videos.csv'), 'cand_dt': 0.1, 'min_gap': 0.4, 'min_gap_hard': 0.2, 'max_gap': 1.5, 'diff_thr': 0.003, 'max_per_video': 120, 'test_fps': 3.0, 'val_frac': 0.2, 'guard_s': 1.0, 'val_videos': '', 'extra_train': 'AdobeStock_1600207728.mov', 'dry_run': False}

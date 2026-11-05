@@ -1,0 +1,9 @@
+{
+  "fps_declared": 30.0,
+  "n_frames": 1076,
+  "tracker": "bytetrack",
+  "video": "C:\\Users\\ACER\\Documents\\logo\\video-val\\test_YTDown.com_YouTube_Media_J4PKGwGjAus_Anna-s-Hummingbird-male-feeding-on-Maple-sap_001_720p.mp4",
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ft_v2\\best.pt",
+  "cfg": "D:\\video_eval\\reentreno\\v2\\tracking\\cfg\\tracker_b_nuevo_bt_combo.yaml",
+  "fps_proceso": 36.5
+}

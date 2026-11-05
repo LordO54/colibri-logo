@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "colibri"
+version = "0.1.0"
+description = "Trayectorias de colibríes en video: detección, seguimiento, puntos clave y profundidad relativa"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+include = ["colibri*"]

@@ -1,0 +1,11 @@
+config,video_id,rol,cortes,visitas,cajas,cubiertas,pred_en_gt,idtp,seg_por_visita,visitas_sin_segmento,puentes_falsos,cobertura,IDF1_visita,segmentos
+actual_30f_1.5,test_ytdown_com_youtube_media_doj1xa6ksqm_colibr,test,1.0,3,18,13,19,9,1.0,0,2,0.7222222222222222,0.4864864864864865,1
+g0.5s_d4,test_ytdown_com_youtube_media_doj1xa6ksqm_colibr,test,1.0,3,18,12,17,5,1.3333333333333333,0,2,0.6666666666666666,0.2857142857142857,2
+actual_30f_1.5,test_ytdown_com_youtube_media_gu30nofexla_hummin,test,4.0,1,26,23,24,23,1.0,0,0,0.8846153846153846,0.92,1
+g0.5s_d4,test_ytdown_com_youtube_media_gu30nofexla_hummin,test,4.0,1,26,23,24,23,1.0,0,0,0.8846153846153846,0.92,1
+actual_30f_1.5,test_ytdown_com_youtube_media_i5befvb5mxg_ruby_t,test,0.0,3,32,29,40,29,1.0,2,0,0.90625,0.8055555555555556,3
+g0.5s_d4,test_ytdown_com_youtube_media_i5befvb5mxg_ruby_t,test,0.0,3,32,29,39,29,1.0,2,0,0.90625,0.8169014084507042,2
+actual_30f_1.5,test_ytdown_com_youtube_media_j4pkgwgjaus_anna_s,test,0.0,11,64,41,54,37,1.1428571428571428,4,3,0.640625,0.6271186440677966,7
+g0.5s_d4,test_ytdown_com_youtube_media_j4pkgwgjaus_anna_s,test,0.0,11,64,42,56,36,1.0,2,6,0.65625,0.6,3
+actual_30f_1.5,GLOBAL,,,18,140,106,137,98,1.0833333333333333,6,5,0.7571428571428571,0.7075812274368231,12
+g0.5s_d4,GLOBAL,,,18,140,106,136,93,1.0714285714285714,4,8,0.7571428571428571,0.6739130434782609,8

@@ -1,0 +1,111 @@
+{
+  "created": "2026-11-01T03:21:36",
+  "seed": 42,
+  "python": "3.11.5",
+  "datasets": {
+    "ds1": {
+      "workspace": "magic-workspace",
+      "project": "hummingbird-dataset-0zvvn",
+      "version": 1,
+      "format": "yolo26",
+      "tipo": "frames de 2 videos",
+      "stretched_from_16_9": true,
+      "license": "MIT (declarada en Roboflow; videos de terceros)"
+    },
+    "ds2": {
+      "workspace": "modelodevisinartificialcolibres",
+      "project": "hummingbirds-detect-classify-gcm5s",
+      "version": 1,
+      "format": "yolo26",
+      "tipo": "fotos variadas",
+      "stretched_from_16_9": false,
+      "license": "CC BY 4.0 (requiere atribución)"
+    }
+  },
+  "splits": {
+    "split_decision": {
+      "use_original_split": false,
+      "leaky_eval_images": 197,
+      "method": "bloques temporales por video + banda de guarda",
+      "segment_gap": 15,
+      "chunk_images": 40,
+      "guard_frames": 15,
+      "min_eval_images": 60,
+      "ratios": {
+        "train": 0.7,
+        "valid": 0.15,
+        "test": 0.15
+      },
+      "dropped_guard": 25,
+      "dropped_augmented_from_eval": 0
+    },
+    "final_yaml": "colibri_work\\data\\final\\data.yaml",
+    "manifest_sha1": "ef37182d98c1a887dc792da57dbfc5789dee8c70",
+    "manifest_sha1_ds2": "406cda9d9482f45e76735fd6a908b952854a8262",
+    "review_notes": {
+      "todas_las_aves_etiquetadas": null,
+      "criterio_caja_consistente": null,
+      "cajas_incluyen_alas_extendidas": null,
+      "observaciones": ""
+    }
+  },
+  "test_video": {
+    "dir": "colibri_work\\data\\final\\test_video",
+    "source": "yilber-lopez/humming (etiquetas corregidas)"
+  },
+  "ultralytics": "8.4.197",
+  "torch": "2.6.0+cu124",
+  "cuda": true,
+  "baseline": {
+    "weights": "yolo26n.pt",
+    "AP50": 0.7077761645187375,
+    "P@0.25": 0.7583333333333333,
+    "R@0.25": 0.5229885057471264,
+    "n_gt": 174
+  },
+  "train": {
+    "base": "yolo26n.pt",
+    "epochs": 40,
+    "imgsz": 640,
+    "batch": 0.7,
+    "cache": "disk",
+    "amp": true,
+    "workers": 3,
+    "fraction": 1.0,
+    "patience": 15,
+    "seed": 42,
+    "deterministic": true,
+    "project": "D:\\video_eval\\colibri_work\\runs",
+    "exist_ok": true,
+    "plots": true,
+    "runs": {
+      "yolo26n_ds2_ds1": "D:\\video_eval\\colibri_work\\runs\\yolo26n_ds2_ds1\\weights\\best.pt",
+      "yolo26n_ds2": "D:\\video_eval\\colibri_work\\runs\\yolo26n_ds2\\weights\\best.pt"
+    }
+  },
+  "eval": {
+    "test_dir": "colibri_work\\data\\final\\test_video",
+    "por_modelo": {
+      "linea_base_coco_bird": {
+        "AP50": 0.7077761645187375,
+        "P@0.25": 0.7583333333333333,
+        "R@0.25": 0.5229885057471264,
+        "n_gt": 174
+      },
+      "yolo26n_ds2_ds1": {
+        "AP50": 0.7952215744653426,
+        "P@0.25": 0.8426966292134831,
+        "R@0.25": 0.8620689655172413,
+        "n_gt": 174
+      },
+      "yolo26n_ds2": {
+        "AP50": 0.7901109438654506,
+        "P@0.25": 0.8238636363636364,
+        "R@0.25": 0.8333333333333334,
+        "n_gt": 174
+      }
+    },
+    "rf_test_map50": 0.9342383609915547,
+    "rf_test_map50_95": 0.6197086298402957
+  }
+}

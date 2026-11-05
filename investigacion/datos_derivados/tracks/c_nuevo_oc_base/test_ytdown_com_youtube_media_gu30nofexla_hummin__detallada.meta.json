@@ -1,0 +1,9 @@
+{
+  "fps_declared": 29.97002997002997,
+  "n_frames": 285,
+  "tracker": "ocsort",
+  "video": "C:\\Users\\ACER\\Documents\\logo\\video-val\\test_YTDown.com_YouTube_Media_Gu30NOfexLA_Humming-Bird-On-Flower-Free-HD-Video_001_720p.mp4",
+  "weights": "C:\\Users\\ACER\\Documents\\logo\\video-val\\resultados\\yolo26n_ft_v2\\best.pt",
+  "cfg": "D:\\video_eval\\reentreno\\v2\\tracking\\cfg\\tracker_c_nuevo_oc_base.yaml",
+  "fps_proceso": 33.9
+}

@@ -1,0 +1,31 @@
+# Configuración de la herramienta. Los valores por defecto son los que mejor han funcionado.
+
+carpetas:                       # relativas a la raíz del repositorio; su contenido queda fuera de git
+  videos: videos                # tus videos
+  datasets: datasets            # tus datasets, para entrenar
+  salidas: salidas              # resultados, una carpeta por video
+
+detector: modelos/yolo26n_ft_v2/best.pt   # el mejor detector publicado; ver modelos/README.md
+
+seguimiento:
+  tracker: bytetrack            # bytetrack u ocsort
+  parametros:                   # se aplican sobre el tracker de Ultralytics
+    track_buffer: 300           # cuadros que un ave puede desaparecer sin perder su identidad
+    match_thresh: 0.95          # tolerancia al emparejar detecciones entre cuadros
+    new_track_thresh: 0.5       # confianza mínima para abrir un seguimiento nuevo
+  confianza: 0.1                # confianza mínima de una detección
+  tamano_imagen: 640
+
+union:                          # une fragmentos de una misma visita
+  hueco_max_s: 1.0              # dos fragmentos se unen si el hueco no supera estos segundos...
+  distancia_max: 2.5            # ...y si la distancia no supera estas veces el lado medio de la caja
+
+puntos:
+  n: 7                          # puntos clave por video
+  metodo: salientes             # salientes: los que más forma aportan; uniforme: equiespaciados en el tiempo con ave
+
+profundidad:                    # Video Depth Anything Small (Apache-2.0); se descarga la primera vez que se usa
+  repo: modelos/Video-Depth-Anything
+  checkpoint: modelos/Video-Depth-Anything/checkpoints/video_depth_anything_vits.pth
+  commit: 4f5ae23172ba60fd7bc11ef671cca678842c7072
+  tamanos: [392, 336, 280]      # resolución de entrada, de mayor a menor si no cabe en la GPU; cambiarla cambia los resultados

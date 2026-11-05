@@ -1,0 +1,41 @@
+# Configuración de la investigación. La leen sus notebooks a través de notebooks/00_comun.ipynb.
+# Las rutas relativas se resuelven desde esta carpeta (investigacion/).
+# Si tus datos están en otro sitio, crea config.local.yaml (fuera de git) con `zona_trabajo: <ruta>`.
+
+zona_trabajo: trabajo                  # todo lo pesado vive aquí, fuera de git
+rutas:                                 # relativas a zona_trabajo
+  videos: datos/fuentes/videos         # {vv,train,test}/<archivo de datos_derivados/fuentes.csv>
+  roboflow: datos/roboflow             # raw/ds1, raw/ds2 (descarga por API) y final/, final_ds2/ (particiones)
+  frames: datos/frames                 # frames regenerados desde los videos (humming v1/v2, prueba vv)
+  runs: runs                           # salidas crudas: Ultralytics, tracking, profundidad
+  modelos: modelos                     # pesos que no van en git y repos externos (Video-Depth-Anything)
+
+# Modo por defecto de todos los notebooks:
+#   artefactos -> usa los modelos y CSV congelados, recalcula las métricas y las compara con las del sprint
+#   recalcular -> rehace también los pasos caros (entrenar ~7 h, tracking, mapas de profundidad)
+modo: artefactos
+
+vigente:                               # docs/decisiones.md
+  detector: ../modelos/yolo26n_ft_v2/best.pt       # D-08 (en el repo)
+  detector_anterior: yolo26n_ds2_ds1/best.pt       # D-05 (en zona_trabajo/modelos; base del ajuste fino)
+  tracker: b_nuevo_bt_combo                        # D-09: ByteTrack, buffer 300, match 0.95, new 0.5
+  union: {max_gap_s: 1.0, max_dist: 2.5}           # D-10: unión prudente
+  puntos: 7                                        # D-12: 7 en total por video
+  profundidad: {backend: vda, modelo: vda-small}   # D-17/D-18: solo como exploración (SP-02.9 pendiente)
+
+vda:                                   # relativo a zona_trabajo; ver entornos/instalar.md
+  repo: modelos/Video-Depth-Anything
+  checkpoint: modelos/Video-Depth-Anything/checkpoints/video_depth_anything_vits.pth
+  sizes: [392, 336, 280]               # resolución de entrada, de mayor a menor si no cabe en la GPU; 392 es la de S8
+
+# Datasets de entrenamiento: los del proyecto. Para usar los tuyos, ver notebooks/01_fuentes_y_datasets.ipynb, sección 2.
+# Cada entrada: proyecto de Roboflow (la clave va en .env, nunca aquí) o `carpeta:` local en formato YOLO.
+datasets:
+  ds1: {workspace: magic-workspace, project: hummingbird-dataset-0zvvn, version: 1, stretched: true, frames_video: true, licencia: "MIT (declarada en Roboflow; procedencia de los videos sin verificar)"}
+  ds2: {workspace: modelodevisinartificialcolibres, project: hummingbirds-detect-classify-gcm5s, version: 1, stretched: false, frames_video: false, licencia: "CC BY 4.0, atribución en el README"}
+regenerar_humming: true                # false con tus datasets: 01 omite humming y vv; 02 entrena en su sección 6
+
+semilla: 42
+tolerancia:                            # diferencia admitida al comparar con las cifras del sprint
+  metrica: 0.01                        # mAP, IDF1, recall...
+  px: 1.0                              # posiciones de los 7 puntos

@@ -8,25 +8,48 @@
 __pycache__/
 .ipynb_checkpoints/
 *.pyc
+*.egg-info/
 
-# Datos pesados: viven en la zona de trabajo (config.yaml), nunca en el repo
+# Lo tuyo: videos, datasets y resultados
+videos/*
+!videos/.gitkeep
+datasets/*
+!datasets/.gitkeep
+salidas/*
+!salidas/.gitkeep
+
+# Nunca en el repo: videos, mapas, datos pesados
 *.mp4
 *.mov
 *.avi
 *.mkv
+*.webm
 *.npz
 *.npy
 *.zip
-!datos_derivados/vv/prueba_etiquetas_corregidas.zip
+!investigacion/datos_derivados/vv/prueba_etiquetas_corregidas.zip
 *.cache
 runs/
 datos/
 
-# Pesos: solo el vigente va en git
+# Pesos: en git solo los detectores publicados en modelos/<nombre>/
 *.pt
 *.pth
-!modelos/yolo26n_ft_v2/best.pt
+!modelos/*/best.pt
+modelos/Video-Depth-Anything/
 
-# Imágenes de datasets (las figuras de resultados sí se versionan)
-datos_derivados/**/*.jpg
-datos_derivados/**/*.png
+# Investigación: ajustes del equipo y zona de trabajo
+investigacion/config.local.yaml
+investigacion/trabajo/
+
+# Imágenes de datasets
+investigacion/datos_derivados/**/*.jpg
+investigacion/datos_derivados/**/*.png
+
+# Figuras con cuadros de video: no se redistribuyen
+*_fondo.png
+tira_*.jpg
+puntos_sobre_video.png
+revision_3d.jpg
+investigacion/resultados/**/trayectoria_*.png
+trayectorias_comparacion.png
