@@ -58,6 +58,8 @@ Cada notebook empieza con una tabla de lo que reproduce y termina con las conclu
 
 ## Replicar desde cero
 
+Guía paso a paso, con un camino corto (solo trayectorias, ~1 h) y otro completo: [`docs/guia_replicacion.md`](docs/guia_replicacion.md).
+
 1. **Entornos:** sigue [`entornos/instalar.md`](entornos/instalar.md) (dos `venv` y un kernel de Jupyter por entorno).
 2. **Clave:** copia `.env.example` como `.env` y pon tu `ROBOFLOW_API_KEY`.
 3. **Videos:** consigue los 12 de [`datos_derivados/fuentes.csv`](datos_derivados/fuentes.csv). Los de YouTube se
